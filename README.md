@@ -213,3 +213,6 @@ This project is open source under the Apache License 2.0. This means:
 Why this license? We want to build this in public and allow others to learn from and contribute to these educational tools, while ensuring we can sustainably maintain and develop the platform, including commercial applications.
 
 You can find the full license in the LICENSE file of this repository.
+
+## **Important Note About AI USAGE**
+We are looking for evidence that you can think through/code different aspects of this problem. We want you to be able to think through ramifications and not just outsource it entirely to ChatGPT/LLMs. This is increasingly important as we find that many who are outsourcing programming to LLMs don't understand the code. This results in multiple issues — it is inefficient, has security vulnerabilities, unknown bugs, and more. This ultimately makes for a bad product too. So please be mindful and meaningful in its use.

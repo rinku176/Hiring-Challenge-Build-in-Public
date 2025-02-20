@@ -44,7 +44,7 @@ Come help us build this ecosystem of tools and transform education for hundreds 
     - Input fields for addends on the other
     - Visual feedback through scale tilt
     - Animations for balance states
-    - Responsive design for different screen sizes
+    - **IMPORTANT**: Responsive design for different screen sizes, especially mobile. 
 3. **Activity Builder**
     - Admin interface for creating other games
     - Configure difficulty levels
@@ -216,3 +216,6 @@ You can find the full license in the LICENSE file of this repository.
 
 ## **Important Note About AI USAGE**
 We are looking for evidence that you can think through/code different aspects of this problem. We want you to be able to think through ramifications and not just outsource it entirely to ChatGPT/LLMs. This is increasingly important as we find that many who are outsourcing programming to LLMs don't understand the code. This results in multiple issues — it is inefficient, has security vulnerabilities, unknown bugs, and more. This ultimately makes for a bad product too. So please be mindful and meaningful in its use.
+
+## **Important Note About Responsive Design**
+It is mentioned above, but worth reiterating. The game should be playable on mobile and desktop. Making learning activities accessible means designing for the most common screen sizes in India in home and classroom settings.

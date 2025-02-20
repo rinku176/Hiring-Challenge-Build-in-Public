@@ -6,6 +6,7 @@ This implementation will serve as a template for how we structure and build futu
 
 >This is an excellent opportunity to showcase your skills while contributing to educational technology. All contributions will be publicly available, and any features or improvements that are incorporated into the project **will be credited to their creators**.
 
+_Please make sur you read this in its entirety_. Understanding the requirements is an important aspect.
 
 ## But First, A Bit About Us
 

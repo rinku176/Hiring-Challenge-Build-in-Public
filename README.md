@@ -51,7 +51,6 @@ Come help us build this ecosystem of tools and transform education for hundreds 
     - Animations for balance states
     - **IMPORTANT**: Responsive design for different screen sizes, especially mobile. 
 3. **Activity Builder**
-    - Admin interface for creating other games
     - Configure difficulty levels
     - Set target ranges and number of addends
     - Preview functionality
@@ -178,7 +177,6 @@ An activity in our platform is any interactive learning experience with clear ed
 
 The Activity Builder interface should allow educators to:
 
-- Create new games
 - Set difficulty parameters:
   - Range of target numbers
   - Number of input fields

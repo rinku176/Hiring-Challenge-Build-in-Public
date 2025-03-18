@@ -140,6 +140,7 @@ Your repository should include:
 
 Document your approach before diving in. What will you tackle first? How will you break this down into manageable pieces? We want to see your thought process.
 
+
 ### **Learning Journey**
 
 Create a LEARNING.md in your repository. Use this to document:
@@ -150,7 +151,39 @@ Create a LEARNING.md in your repository. Use this to document:
 - Design decisions and their reasoning
 - Things you'd do differently next time
 
-Keep it real - we're interested in your authentic experience and growth through this project.
+Keep it real - we're interested in your authentic experience--and words---and growth through this project.
+
+### **Commit Guidelines**
+
+It is important that you create a repo and update it frequently with meaningful commit messages. This helps us understand your development process. We also do not want to see code created by someone else or AI-code which you do not understand. Use of AI tools is fine, but you must be able to code, and understand the code that is in the repo.
+
+## 1. Commit Frequently
+- Make a commit whenever a logical part of your feature is complete
+- Each commit should reflect incremental progress rather than large, unrelated changes
+
+## 2. Use Meaningful Commit Messages
+- Clearly describe what each commit does. Avoid generic messages like "Updated code" or "Fixed bugs"
+  
+  **Good examples:**
+  - ✅ Added user authentication with JWT
+  - ✅ Styled the login page and fixed layout issues
+  - ✅ Connected frontend form with backend API
+
+## 3. Keep Commits Small and Atomic
+- Each commit should ideally introduce a single feature, fix, or improvement
+- Avoid large, single commits that contain multiple unrelated changes
+
+## 4. Commit Code You Write, Not Just Final Versions
+- Don't wait until the whole feature is complete to commit. Commit as you build
+- Show your thought process through progressive commits
+
+## 5. Push Regularly to GitHub
+- Push your commits to the GitHub repository at least once every few hours
+- This allows us to see your progress over time instead of a single final submission
+
+## 6. Avoid Large, Single Commits
+- Your commits should reflect incremental progress rather than a single commit containing the entire project or a major portion of the code
+- Large, single commits make it difficult to assess your development process and may raise concerns about the originality of your work, which could be flagged
 
 ## **Important Note**
 

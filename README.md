@@ -153,7 +153,7 @@ Create a LEARNING.md in your repository. Use this to document:
 
 Keep it real - we're interested in your authentic experience--and words---and growth through this project.
 
-### **Commit Guidelines**
+### **IMPORTANT! Commit Guidelines**
 
 It is important that you create a repo and update it frequently with meaningful commit messages. This helps us understand your development process. We also do not want to see code created by someone else or AI-code which you do not understand. Use of AI tools is fine, but you must be able to code, and understand the code that is in the repo.
 

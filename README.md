@@ -122,7 +122,7 @@ You can find the full license in the LICENSE file of this repository.
 
 ## **Getting Started**
 
-1. Fork the repository
+1. Fork the repository **and keep it private** (please see documentation adn commit guidelines below; we'll ask you at the end to share access with our github ids)
 2. Review the documentation
 3. Set up your development environment
 4. Create your project plan:

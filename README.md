@@ -1,6 +1,6 @@
 ## **Your Challenge: Build Our First Interactive Activity**
 
-**March 2, 2025**: If you are not arriving here from one of our job listing posts, please [see this](https://www.comini.in/hiring_soft_dev).
+**April 12, 2025**: If you are not arriving here from one of our job listing posts, please [see this](https://www.comini.in/hiring_soft_dev).
 
 For this challenge, you'll implement one of our planned activities: **The Balance Scale Addition Game**. This game teaches addition through visual intuition - imagine a balance scale where students need to find numbers that add up to match a target value. When they're close but not quite right, the scale tilts to show them if their sum is too large or too small!
 

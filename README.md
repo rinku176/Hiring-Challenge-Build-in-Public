@@ -8,7 +8,7 @@ This implementation will serve as a template for how we structure and build futu
 
 >This is an excellent opportunity to showcase your skills while contributing to educational technology. All contributions will be publicly available, and any features or improvements that are incorporated into the project **will be credited to their creators**.
 
-_Please make sur you read this in its entirety_. Understanding the requirements is an important aspect.
+_Please make sure you read this in its entirety_. Understanding the requirements is an important aspect.
 
 **An Important Note**: A big part of building something great is to be able to understand a problem, see what potential solutions can be and work with ambiguity that is part of our life. We won't know whether users will truly like a feature, or like the idea of it, but not its current implementation. Your role is to not just blindly check off a set of tasks, but to understand the greater goal and see how the tasks fit into this context and how you can resolve any ambiguity based on the goal. This must be balanced with certain hard considerations. For instance, there are reasons we want you to use the specific stack given here. This may be new to you, but that's part of the challenge -- picking something up quickly. Hope you'll enjoy working on this, and also learn. Also, make sure you understand your code intimately. AI tools can build products, but if those are black boxes, you run a big risk of not knowing what errors lurk inside. Imagine building a skyscraper, but knowing nothing about how deep the foundation goes, or if it can stand the test of time or typhoons. Thanks!
 

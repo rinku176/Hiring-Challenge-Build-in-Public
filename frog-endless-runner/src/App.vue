@@ -2,6 +2,7 @@
   <div class="page-view">
     <div class="page-container">
       <canvas ref="gameCanvas" width="1000" height="600" style="border: 2px solid green;"></canvas>
+      <button v-if="showRetry" class="retry-btn" @click="resetGame">Retry</button>
     </div>
   </div>
 </template>
@@ -20,6 +21,23 @@
   width: 1000px;
   height: 630px;
 }
+
+.retry-btn 
+{
+  position: absolute;
+  top: 360px; /* Below 'Game Over' canvas text */
+  transform: translateX(-50%);
+  padding: 10px 20px;
+  font-size: 18px;
+  background-color: #2ecc71;
+  color: white;
+  border-radius: 8px;
+}
+
+.retry-btn:hover 
+{
+  background-color: #27ae60;
+}
 </style>
 
 
@@ -27,15 +45,18 @@
 import { onMounted, ref } from 'vue'
 
 const gameCanvas = ref(null)
+const showRetry = ref(false)
 
 let frogX = 100 // frog starts at the left
 let frogY = 300
 
 let lilypads = []
 
-function drawLilypads(ctx) {
 let currentNumber = 2
 let skipStep = 2
+
+let lives = 3
+let gameOver = false
 
 function drawLilypads(ctx) 
 {
@@ -69,6 +90,13 @@ function drawFrog(ctx)
 
 }
 
+function drawHUD(ctx) 
+{
+  ctx.fillStyle = 'black'
+  ctx.font = '20px Arial'
+  ctx.fillText(`Lives: ${lives}`, 850, 30)
+}
+
 function generateLilypads() 
 {
   const correctNumber = currentNumber + skipStep
@@ -93,6 +121,31 @@ function generateLilypads()
   }))
 }
 
+function drawGameOver(ctx) 
+{
+  ctx.fillStyle = 'rgba(0,0,0,0.6)'
+  ctx.fillRect(0, 0, 1000, 680)
+
+  ctx.fillStyle = 'white'
+  ctx.font = '40px Arial'
+  ctx.fillText('Game Over', 400, 300)
+}
+
+function resetGame() 
+{
+  lives = 3
+  gameOver = false
+  currentNumber = 2
+  frogX= 100
+  frogY = 300
+  lilypads = generateLilypads()
+  showRetry.value = false
+  const canvas = gameCanvas.value
+  const ctx = canvas.getContext('2d')
+  updateGame(canvas, ctx)
+}
+
+
 function updateGame(canvas, ctx) 
 {
  // Drawing
@@ -102,6 +155,14 @@ function updateGame(canvas, ctx)
 
   drawLilypads(ctx)
   drawFrog(ctx)
+  drawHUD(ctx)
+
+  if (gameOver) 
+  {
+    drawGameOver(ctx)
+    showRetry.value = true
+    return
+  }
 }
 
 onMounted(() => 
@@ -113,6 +174,11 @@ onMounted(() =>
 
   canvas.addEventListener('mousedown', e => 
   {
+    if (gameOver) 
+    {
+      return
+    }
+
     const rect = canvas.getBoundingClientRect()
     const clickX = e.clientX - rect.left
     const clickY = e.clientY - rect.top
@@ -130,6 +196,12 @@ onMounted(() =>
           currentNumber += skipStep
           lilypads= generateLilypads()
           console.log('Correct! Current number:', pad.number)
+        }
+        else
+        {
+          lives -= 1
+          if (lives <= 0) 
+            gameOver = true
         }
         break;
       }

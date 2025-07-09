@@ -170,7 +170,7 @@ function drawHUD(ctx)
 
 function generateLilypads() 
 {
-  const correctNumber = currentNumber + skipStep
+  const correctNumber = currentNumber + skipStep * (1 + lilypads.length - nextcolumn)
   const wrongNumbers = new Set()
   while (wrongNumbers.size < 2) 
   {
@@ -190,7 +190,7 @@ function generateLilypads()
     number: allNumbers[i],
     isCorrect: allNumbers[i] === correctNumber
   })))
-  
+
 }
 
 function drawGameOver(ctx) 
@@ -215,7 +215,7 @@ function resetGame()
   nextcolumn = 0
   stickpad = null
   showRetry.value = false
-  updateGame()
+  updateJumpArc()
   render()
 }
 
@@ -264,13 +264,6 @@ function render()
   requestAnimationFrame(render)
 }
 
-function updateGame() 
-{
-  updateJumpArc()
-
- 
-}
-
 onMounted(() => 
 {
   const canvas = gameCanvas.value
@@ -282,7 +275,6 @@ onMounted(() =>
 
   canvas.addEventListener('mousedown', e => 
   {
-    
     if (jumping ||gameOver) 
       return
 
@@ -322,9 +314,9 @@ onMounted(() =>
       }
       
     }
-    updateGame()
+    updateJumpArc()
   })
 
-  updateGame()
+  updateJumpArc()
 })
 </script>

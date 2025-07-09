@@ -49,10 +49,11 @@ const showRetry = ref(false)
 let frogX = 100 // frog starts at the left
 let frogY = 300
 
-let lilypads = []
-
+let lilypads = new Array()
+let nextcolumn = 0 
 let currentNumber = 2
 let skipStep = 2
+
 
 let lives = 3
 let gameOver = false
@@ -67,20 +68,37 @@ const gravity = 0.5
 function drawLilypads(ctx) 
 {
   ctx.font = '20px Arial'
-  lilypads.forEach(pad => 
+  lilypads.forEach(set => 
   {
-    ctx.save()
+    set.forEach(pad =>
+    {
+      ctx.save()
 
-    ctx.fillStyle = '#339966'
-    ctx.beginPath()
-    ctx.ellipse(pad.x, pad.y, 50, 40, 0, 0, Math.PI * 2)
-    ctx.fill()
+      ctx.fillStyle = '#339966'
+      ctx.beginPath()
+      ctx.ellipse(pad.x, pad.y, 50, 40, 0, 0, Math.PI * 2)
+      ctx.fill()
 
-    ctx.fillStyle = 'white'
-    ctx.fillText(pad.number, pad.x - 10, pad.y + 5)
+      ctx.fillStyle = 'white'
+      ctx.fillText(pad.number, pad.x - 10, pad.y + 5)
 
-    ctx.restore()
+      ctx.restore()
+    })
   })
+
+  //to move the lilypads from right to left
+  lilypads.forEach(set => 
+  {
+    set.forEach(pad =>
+      pad.x -= 2 // speed of movement
+      )
+    if (set[0] < 0)
+    {
+      lilypads.shift()
+      nextcolumn--
+    }
+  })
+
 }
 
 function drawFrog(ctx) 
@@ -131,13 +149,14 @@ function generateLilypads()
   allNumbers.sort(() => Math.random() - 0.5)
   const y = [130, 300, 480];
 
-  return y.map((height,i) => (
+  lilypads.push (y.map((height,i) => (
   {
-    x: 300,
+    x: 1300,
     y: height,
     number: allNumbers[i],
     isCorrect: allNumbers[i] === correctNumber
-  }))
+  })))
+  
 }
 
 function drawGameOver(ctx) 
@@ -157,16 +176,15 @@ function resetGame()
   currentNumber = 2
   frogX= 100
   frogY = 300
-  lilypads = generateLilypads()
+  lilypads = new Array()
+  nextcolumn = 0
   showRetry.value = false
-
   updateGame()
   render()
 }
 
 function updateJumpArc()
 {
-
   if (jumping) 
   {
     frogX += velocityX
@@ -183,7 +201,6 @@ function updateJumpArc()
       velocityX = 0
       velocityY = 0
       jumping = false
-      
     }
   }
 
@@ -193,12 +210,11 @@ function updateJumpArc()
 
 function render()
 {
-
   const canvas = gameCanvas.value
   const ctx = canvas.getContext('2d')
 
   // Drawing
-  ctx.clearRect(0, 0, canvas.width, canvas.height)
+  //ctx.clearRect(0, 0, canvas.width, canvas.height)
   ctx.fillStyle = '#ccffcc'
   ctx.fillRect(0, 0, canvas.width, canvas.height)
 
@@ -214,37 +230,10 @@ function render()
 
 function updateGame() 
 {
-  // Check if frog is on a lilypad
-  for (let pad of lilypads) 
-  {
-    const dx = frogX - pad.x
-    const dy = frogY - pad.y
-    const dist = Math.sqrt(dx * dx + dy * dy)
-
-    if (dist < 50) 
-    {
-      if (pad.isCorrect) 
-      {
-        jumpTo(pad.x, pad.y)
-        currentNumber += skipStep
-        lilypads = generateLilypads()
-        console.log('Correct! Current number:', pad.number)
-      }
-      else 
-      {
-        lives -= 1
-        if (lives <= 0) 
-          gameOver = true
-      }
-      break;
-    }
-  }
-
   updateJumpArc()
 
   if (gameOver) 
   {
-  
     showRetry.value = true
     return
   }
@@ -254,7 +243,9 @@ onMounted(() =>
 {
   const canvas = gameCanvas.value
   
-  lilypads = generateLilypads()
+  setInterval(generateLilypads, 7000)
+  generateLilypads()
+
   render()
 
   canvas.addEventListener('mousedown', e => 
@@ -262,12 +253,12 @@ onMounted(() =>
     
     if (jumping ||gameOver) 
       return
-    
+
     const rect = canvas.getBoundingClientRect()
     const clickX = e.clientX - rect.left
     const clickY = e.clientY - rect.top
 
-    for (let pad of lilypads) 
+    for (let pad of lilypads[nextcolumn]) 
     {
       const dx = clickX - pad.x
       const dy = clickY - pad.y
@@ -279,18 +270,23 @@ onMounted(() =>
 
         if (pad.isCorrect) 
         {
+          nextcolumn++
           currentNumber += skipStep
-          lilypads= generateLilypads()
+          
           console.log('Correct! Current number:', pad.number)
         }
         else
         {
           lives -= 1
-          if (lives <= 0) 
+          if (lives <= 0)
+          {
+            lives =0
             gameOver = true
+          }
         }
         break;
       }
+      
     }
     updateGame()
   })

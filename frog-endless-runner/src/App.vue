@@ -40,7 +40,6 @@
 }
 </style>
 
-
 <script setup>
 import { onMounted, ref } from 'vue'
 
@@ -58,6 +57,13 @@ let skipStep = 2
 let lives = 3
 let gameOver = false
 
+let targetX = frogX
+let targetY = frogY
+let jumping = false
+let velocityX = 0
+let velocityY = 0
+const gravity = 0.5
+
 function drawLilypads(ctx) 
 {
   ctx.font = '20px Arial'
@@ -70,7 +76,7 @@ function drawLilypads(ctx)
     ctx.ellipse(pad.x, pad.y, 50, 40, 0, 0, Math.PI * 2)
     ctx.fill()
 
-     ctx.fillStyle = 'white'
+    ctx.fillStyle = 'white'
     ctx.fillText(pad.number, pad.x - 10, pad.y + 5)
 
     ctx.restore()
@@ -87,7 +93,20 @@ function drawFrog(ctx)
   ctx.fillStyle = 'white'
   ctx.font = '16px Arial'
   ctx.fillText(currentNumber, frogX - 15, frogY + 5)
+}
 
+function jumpTo(x,y)
+{
+  if (jumping) 
+    return
+
+  jumping = true
+  targetX = x
+  targetY = y
+
+  const frames = 20
+  velocityX = (targetX - frogX) / frames
+  velocityY = (targetY - frogY - 50) / frames // slight arc
 }
 
 function drawHUD(ctx) 
@@ -140,15 +159,45 @@ function resetGame()
   frogY = 300
   lilypads = generateLilypads()
   showRetry.value = false
-  const canvas = gameCanvas.value
-  const ctx = canvas.getContext('2d')
-  updateGame(canvas, ctx)
+
+  updateGame()
+  render()
 }
 
-
-function updateGame(canvas, ctx) 
+function updateJumpArc()
 {
- // Drawing
+
+  if (jumping) 
+  {
+    frogX += velocityX
+    frogY += velocityY
+    velocityY += gravity
+
+    // Stop when near target
+    const dx = Math.abs(frogX - targetX)
+    const dy = Math.abs(frogY - targetY)
+    if (dx < 50 && dy < 50) 
+    {
+      frogX = targetX
+      frogY = targetY
+      velocityX = 0
+      velocityY = 0
+      jumping = false
+      
+    }
+  }
+
+  requestAnimationFrame(updateJumpArc)
+
+}
+
+function render()
+{
+
+  const canvas = gameCanvas.value
+  const ctx = canvas.getContext('2d')
+
+  // Drawing
   ctx.clearRect(0, 0, canvas.width, canvas.height)
   ctx.fillStyle = '#ccffcc'
   ctx.fillRect(0, 0, canvas.width, canvas.height)
@@ -158,8 +207,44 @@ function updateGame(canvas, ctx)
   drawHUD(ctx)
 
   if (gameOver) 
-  {
     drawGameOver(ctx)
+  
+  requestAnimationFrame(render)
+}
+
+function updateGame() 
+{
+  // Check if frog is on a lilypad
+  for (let pad of lilypads) 
+  {
+    const dx = frogX - pad.x
+    const dy = frogY - pad.y
+    const dist = Math.sqrt(dx * dx + dy * dy)
+
+    if (dist < 50) 
+    {
+      if (pad.isCorrect) 
+      {
+        jumpTo(pad.x, pad.y)
+        currentNumber += skipStep
+        lilypads = generateLilypads()
+        console.log('Correct! Current number:', pad.number)
+      }
+      else 
+      {
+        lives -= 1
+        if (lives <= 0) 
+          gameOver = true
+      }
+      break;
+    }
+  }
+
+  updateJumpArc()
+
+  if (gameOver) 
+  {
+  
     showRetry.value = true
     return
   }
@@ -168,17 +253,16 @@ function updateGame(canvas, ctx)
 onMounted(() => 
 {
   const canvas = gameCanvas.value
-  const ctx = canvas.getContext('2d')
-
+  
   lilypads = generateLilypads()
+  render()
 
   canvas.addEventListener('mousedown', e => 
   {
-    if (gameOver) 
-    {
+    
+    if (jumping ||gameOver) 
       return
-    }
-
+    
     const rect = canvas.getBoundingClientRect()
     const clickX = e.clientX - rect.left
     const clickY = e.clientY - rect.top
@@ -190,7 +274,9 @@ onMounted(() =>
       const dist = Math.sqrt(dx * dx + dy * dy)
 
       if (dist < 50) 
-      {
+      { 
+        jumpTo(pad.x, pad.y)
+
         if (pad.isCorrect) 
         {
           currentNumber += skipStep
@@ -206,9 +292,9 @@ onMounted(() =>
         break;
       }
     }
-    updateGame(canvas, ctx)
+    updateGame()
   })
 
-  updateGame(canvas, ctx)
+  updateGame()
 })
 </script>

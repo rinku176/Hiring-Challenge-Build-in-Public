@@ -64,6 +64,7 @@ let jumping = false
 let velocityX = 0
 let velocityY = 0
 const gravity = 0.5
+let stickpad = null 
 
 function drawLilypads(ctx) 
 {
@@ -102,7 +103,16 @@ function drawLilypads(ctx)
 }
 
 function drawFrog(ctx) 
-{
+{ 
+  if (!jumping && stickpad)
+  {
+    frogX = stickpad.x
+    frogY = stickpad.y
+  }
+
+  if ( frogX < 0)
+    forcedFrogJump()
+
   ctx.beginPath()
   ctx.arc(frogX, frogY, 30, 0, Math.PI * 2)
   ctx.fillStyle = 'green'
@@ -125,6 +135,30 @@ function jumpTo(x,y)
   const frames = 20
   velocityX = (targetX - frogX) / frames
   velocityY = (targetY - frogY - 50) / frames // slight arc
+}
+
+function forcedFrogJump()
+{
+ 
+  for (let pad of lilypads[nextcolumn])
+  {
+    if (pad.isCorrect) 
+    {
+      jumpTo(pad.x, pad.y)
+      stickpad = pad
+      nextcolumn++
+      currentNumber += skipStep
+      lives--
+
+      if(lives<=0)
+      {
+        lives = 0
+        gameOver = true
+      }
+      break;
+    }
+    
+  }
 }
 
 function drawHUD(ctx) 
@@ -161,6 +195,7 @@ function generateLilypads()
 
 function drawGameOver(ctx) 
 {
+  showRetry.value = true
   ctx.fillStyle = 'rgba(0,0,0,0.6)'
   ctx.fillRect(0, 0, 1000, 680)
 
@@ -178,6 +213,7 @@ function resetGame()
   frogY = 300
   lilypads = new Array()
   nextcolumn = 0
+  stickpad = null
   showRetry.value = false
   updateGame()
   render()
@@ -232,18 +268,14 @@ function updateGame()
 {
   updateJumpArc()
 
-  if (gameOver) 
-  {
-    showRetry.value = true
-    return
-  }
+ 
 }
 
 onMounted(() => 
 {
   const canvas = gameCanvas.value
   
-  setInterval(generateLilypads, 7000)
+  setInterval(generateLilypads, 5500)
   generateLilypads()
 
   render()
@@ -270,6 +302,8 @@ onMounted(() =>
 
         if (pad.isCorrect) 
         {
+          //go with the lilypad
+          stickpad = pad
           nextcolumn++
           currentNumber += skipStep
           

@@ -3,6 +3,10 @@
     <div class="page-container">
       <canvas ref="gameCanvas" width="1000" height="600" style="border: 2px solid green;"></canvas>
       <button v-if="showRetry" class="retry-btn" @click="resetGame">Retry</button>
+      <button v-if="!showResume" class="pause-btn" @click="pauseGame">Pause</button>
+      <button v-if="showResume" class="resume-btn" @click="resumeGame">Resume</button>
+
+
     </div>
   </div>
 </template>
@@ -20,6 +24,22 @@
   position: relative;
   width: 1000px;
   height: 630px;
+}
+.pause-btn, .resume-btn
+{
+  position: absolute;
+  top: 20px; 
+  left: 20px;
+  padding: 10px 20px;
+  font-size: 18px;
+  background-color: #ab2a93;
+  color: white;
+  border-radius: 8px;
+}
+
+.pause-btn:hover , .resume-btn:hover
+{
+  background-color: #902085;
 }
 
 .retry-btn 
@@ -45,6 +65,7 @@ import { onMounted, ref } from 'vue'
 
 const gameCanvas = ref(null)
 const showRetry = ref(false)
+const showResume = ref(false)
 
 let frogX = 100 // frog starts at the left
 let frogY = 300
@@ -57,6 +78,7 @@ let skipStep = 2
 
 let lives = 3
 let gameOver = false
+let pause = false
 
 let targetX = frogX
 let targetY = frogY
@@ -206,6 +228,34 @@ function drawGameOver(ctx)
   clearInterval(lilypadTimer)
 }
 
+function drawPauseGame(ctx) 
+{
+  
+  showResume.value = true
+  ctx.fillStyle = 'rgba(0,0,0,0.6)'
+  ctx.fillRect(0, 0, 1000, 680)
+
+  ctx.fillStyle = 'white'
+  ctx.font = '40px Arial'
+  ctx.fillText('Game Paused', 400, 300)
+
+  clearInterval(lilypadTimer)
+}
+
+function pauseGame() 
+{
+  pause = true
+}
+
+function resumeGame() 
+{
+  pause = false
+  showResume.value = false
+  generateLilypads()
+  lilypadTimer = setInterval(generateLilypads, 5500)
+  render()
+}
+
 function resetGame() 
 {
   lives = 3
@@ -254,7 +304,6 @@ function render()
   const ctx = canvas.getContext('2d')
 
   // Drawing
-  //ctx.clearRect(0, 0, canvas.width, canvas.height)
   ctx.fillStyle = '#ccffcc'
   ctx.fillRect(0, 0, canvas.width, canvas.height)
 
@@ -264,7 +313,8 @@ function render()
 
   if (gameOver) 
     drawGameOver(ctx)
-
+  else if (pause)
+    drawPauseGame(ctx)
   else
     requestAnimationFrame(render)
  

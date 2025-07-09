@@ -65,6 +65,7 @@ let velocityX = 0
 let velocityY = 0
 const gravity = 0.5
 let stickpad = null 
+let lilypadTimer = null
 
 function drawLilypads(ctx) 
 {
@@ -190,7 +191,6 @@ function generateLilypads()
     number: allNumbers[i],
     isCorrect: allNumbers[i] === correctNumber
   })))
-
 }
 
 function drawGameOver(ctx) 
@@ -202,6 +202,8 @@ function drawGameOver(ctx)
   ctx.fillStyle = 'white'
   ctx.font = '40px Arial'
   ctx.fillText('Game Over', 400, 300)
+
+  clearInterval(lilypadTimer)
 }
 
 function resetGame() 
@@ -217,6 +219,8 @@ function resetGame()
   showRetry.value = false
   updateJumpArc()
   render()
+  generateLilypads()
+  lilypadTimer = setInterval(generateLilypads, 5500)
 }
 
 function updateJumpArc()
@@ -260,15 +264,17 @@ function render()
 
   if (gameOver) 
     drawGameOver(ctx)
-  
-  requestAnimationFrame(render)
+
+  else
+    requestAnimationFrame(render)
+ 
 }
 
 onMounted(() => 
 {
   const canvas = gameCanvas.value
   
-  setInterval(generateLilypads, 5500)
+  lilypadTimer = setInterval(generateLilypads, 5500)
   generateLilypads()
 
   render()

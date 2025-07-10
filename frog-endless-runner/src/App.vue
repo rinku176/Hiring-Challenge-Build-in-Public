@@ -89,6 +89,7 @@ let beepad = null
 let lilypadTimer = null
 let AttachBeepadTimer = null
 
+
 function drawLilypads(ctx) 
 {
   ctx.font = '20px Arial'
@@ -314,9 +315,9 @@ function updateJumpArc()
 
 function AttachBeepad()
 {
-  let randomIndexRow = Math.floor(Math.random() *3 + 0.99)
-  let randomIndexCol = Math.floor(Math.random() * lilypads.length + 0.99)
-  beepad = lilypads[randomIndexCol][randomIndexRow]
+  let randomIndexRow = Math.floor(Math.random() *3 -0.1)
+  let randomIndexCol = Math.floor(Math.random() * lilypads.length -0.1)
+  beepad = lilypads[randomIndexCol][randomIndexRow ]
 }
 
 function render()

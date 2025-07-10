@@ -5,8 +5,6 @@
       <button v-if="showRetry" class="retry-btn" @click="resetGame">Retry</button>
       <button v-if="!showResume" class="pause-btn" @click="pauseGame">Pause</button>
       <button v-if="showResume" class="resume-btn" @click="resumeGame">Resume</button>
-
-
     </div>
   </div>
 </template>
@@ -87,7 +85,9 @@ let velocityX = 0
 let velocityY = 0
 const gravity = 0.5
 let stickpad = null 
+let beepad = null 
 let lilypadTimer = null
+let AttachBeepadTimer = null
 
 function drawLilypads(ctx) 
 {
@@ -146,6 +146,13 @@ function drawFrog(ctx)
   ctx.fillText(currentNumber, frogX - 15, frogY + 5)
 }
 
+function drawDistraction(ctx) 
+{
+  ctx.font = '24px Arial'
+  if(beepad)
+    ctx.fillText("🐝", beepad.x+10,beepad.y+20)
+}
+
 function jumpTo(x,y)
 {
   if (jumping) 
@@ -193,6 +200,7 @@ function drawHUD(ctx)
 
 function generateLilypads() 
 {
+
   const correctNumber = currentNumber + skipStep * (1 + lilypads.length - nextcolumn)
   const wrongNumbers = new Set()
   while (wrongNumbers.size < 2) 
@@ -213,6 +221,8 @@ function generateLilypads()
     number: allNumbers[i],
     isCorrect: allNumbers[i] === correctNumber
   })))
+
+  
 }
 
 function drawGameOver(ctx) 
@@ -226,6 +236,7 @@ function drawGameOver(ctx)
   ctx.fillText('Game Over', 400, 300)
 
   clearInterval(lilypadTimer)
+  clearInterval(AttachBeepadTimer)
 }
 
 function drawPauseGame(ctx) 
@@ -240,6 +251,7 @@ function drawPauseGame(ctx)
   ctx.fillText('Game Paused', 400, 300)
 
   clearInterval(lilypadTimer)
+  clearInterval(AttachBeepadTimer)
 }
 
 function pauseGame() 
@@ -253,6 +265,7 @@ function resumeGame()
   showResume.value = false
   generateLilypads()
   lilypadTimer = setInterval(generateLilypads, 5500)
+  AttachBeepadTimer = setInterval(AttachBeepad, Math.random() * 10000 + 2000)
   render()
 }
 
@@ -271,6 +284,7 @@ function resetGame()
   render()
   generateLilypads()
   lilypadTimer = setInterval(generateLilypads, 5500)
+  AttachBeepadTimer = setInterval(AttachBeepad, Math.random() * 10000 + 2000)
 }
 
 function updateJumpArc()
@@ -298,6 +312,13 @@ function updateJumpArc()
 
 }
 
+function AttachBeepad()
+{
+  let randomIndexRow = Math.floor(Math.random() *3 + 0.99)
+  let randomIndexCol = Math.floor(Math.random() * lilypads.length + 0.99)
+  beepad = lilypads[randomIndexCol][randomIndexRow]
+}
+
 function render()
 {
   const canvas = gameCanvas.value
@@ -310,6 +331,9 @@ function render()
   drawLilypads(ctx)
   drawFrog(ctx)
   drawHUD(ctx)
+  
+  if(beepad)
+    drawDistraction(ctx)
 
   if (gameOver) 
     drawGameOver(ctx)
@@ -326,7 +350,8 @@ onMounted(() =>
   
   lilypadTimer = setInterval(generateLilypads, 5500)
   generateLilypads()
-
+  
+  AttachBeepadTimer = setInterval(AttachBeepad, Math.random() * 10000 + 2000) 
   render()
 
   canvas.addEventListener('mousedown', e => 

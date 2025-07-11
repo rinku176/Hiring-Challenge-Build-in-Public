@@ -1,38 +1,47 @@
 <template>
   <div class="page-view">
     <div class="page-container">
-      <canvas ref="gameCanvas" width="1000" height="600" style="border: 2px solid green;"></canvas>
+      <canvas ref="gameCanvas" v-bind:width="screenWidth*0.80" v-bind:height="screenHeight*0.80" class="canvasClass" style="border: 2px solid green;">
       <button v-if="showRetry" class="retry-btn" @click="resetGame">Retry</button>
       <button v-if="!showResume" class="pause-btn" @click="pauseGame">Pause</button>
       <button v-if="showResume" class="resume-btn" @click="resumeGame">Resume</button>
+      </canvas>
+      
     </div>
   </div>
 </template>
 
 <style scoped>
+
+.canvasClass 
+{
+  position: absolute;
+}
+
 .page-view 
 {
   display: flex;
   justify-content: center;
-  margin-top: 20px;
+  margin-top: 1px;
 }
 
 .page-container 
 {
   position: relative;
-  width: 1000px;
-  height: 630px;
+  width: 10dp;
+  height: 630dp;
 }
+
 .pause-btn, .resume-btn
 {
-  position: absolute;
-  top: 20px; 
-  left: 20px;
-  padding: 10px 20px;
-  font-size: 18px;
+  position: relative;
+  top: 20dp; 
+  left: 20dp;
+  padding: 10dp 20dp;
+  font-size: 18dp;
   background-color: #ab2a93;
   color: white;
-  border-radius: 8px;
+  border-radius: 8dp;
 }
 
 .pause-btn:hover , .resume-btn:hover
@@ -45,11 +54,11 @@
   position: absolute;
   top: 360px; /* Below 'Game Over' canvas text */
   transform: translateX(-50%);
-  padding: 10px 20px;
-  font-size: 18px;
+  padding: 10dp 20dp;
+  font-size: 18dp;
   background-color: #2ecc71;
   color: white;
-  border-radius: 8px;
+  border-radius: 8dp;
 }
 
 .retry-btn:hover 
@@ -64,6 +73,8 @@ import { onMounted, ref } from 'vue'
 const gameCanvas = ref(null)
 const showRetry = ref(false)
 const showResume = ref(false)
+let screenWidth = document.documentElement.clientWidth
+let screenHeight = document.documentElement.clientHeight
 
 let frogX = 100 // frog starts at the left
 let frogY = 300
@@ -322,6 +333,9 @@ function AttachBeepad()
 
 function render()
 {
+  screenWidth = document.documentElement.clientWidth
+  screenHeight = document.documentElement.clientHeight
+
   const canvas = gameCanvas.value
   const ctx = canvas.getContext('2d')
 

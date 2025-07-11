@@ -26,8 +26,8 @@ body {
   margin: 0;
   display: flex;
   place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
+  min-width: 2rem;
+  min-height: 2rem;
 }
 
 h1 {
@@ -59,8 +59,8 @@ button:focus-visible {
 }
 
 #app {
-  max-width: 1280px;
-  margin: 0 auto;
+  max-width: 100%;
+  margin: auto;
   padding: 2rem;
   text-align: center;
 }

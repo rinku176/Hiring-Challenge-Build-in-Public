@@ -5,6 +5,7 @@
       <button v-if="showRetry" class="retry-btn" @click="resetGame">Retry</button>
       <button v-if="!showResume" class="pause-btn" @click="pauseGame">Pause</button>
       <button v-if="showResume" class="resume-btn" @click="resumeGame">Resume</button>
+      <button v-if="showRewardContinue" class="continue-btn" @click="continueGame">Continue</button>
     </div>
   </div>
 </template>
@@ -23,6 +24,7 @@
   width: 1000px;
   height: 630px;
 }
+
 .pause-btn, .resume-btn
 {
   position: absolute;
@@ -56,6 +58,24 @@
 {
   background-color: #27ae60;
 }
+
+.continue-btn 
+{
+  position: absolute;
+  top: 400px; /* Below reward screen text */
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 10px 20px;
+  font-size: 18px;
+  background-color: #3498db;
+  color: white;
+  border-radius: 8px;
+}
+
+.continue-btn:hover 
+{
+  background-color: #2980b9;
+}
 </style>
 
 <script setup>
@@ -64,6 +84,7 @@ import { onMounted, ref } from 'vue'
 const gameCanvas = ref(null)
 const showRetry = ref(false)
 const showResume = ref(false)
+const showRewardContinue = ref(false)
 
 let frogX = 100 // frog starts at the left
 let frogY = 300
@@ -72,12 +93,14 @@ let lilypads = new Array()
 let nextcolumn = 0 
 let currentNumber = 2
 let skipStep = 2
-
+let speed = 0.8
 
 let lives = 3
 let gameOver = false
 let pause = false
+let showReward = false
 
+let firstCorrect = false // to check if the first correct lilypad is clicked
 let targetX = frogX
 let targetY = frogY
 let jumping = false
@@ -88,6 +111,13 @@ let stickpad = null
 let beepad = null 
 let lilypadTimer = null
 let AttachBeepadTimer = null
+let streak = 0
+
+// Reward animation variables
+let flyX = 500
+let flyY = 200
+let rewardAnimationFrame = 0
+let tongueExtended = false
 
 
 function drawLilypads(ctx) 
@@ -111,19 +141,20 @@ function drawLilypads(ctx)
     })
   })
 
-  //to move the lilypads from right to left
-  lilypads.forEach(set => 
-  {
-    set.forEach(pad =>
-      pad.x -= 2 // speed of movement
-      )
-    if (set[0] < 0)
+  if (firstCorrect)
+  { //to move the lilypads from right to left
+    lilypads.forEach(set => 
     {
-      lilypads.shift()
-      nextcolumn--
-    }
-  })
-
+      set.forEach(pad =>
+        pad.x -= speed // speed of movement
+        )
+      if (set[0] < 0)
+      {
+        lilypads.shift()
+        nextcolumn--
+      }
+    })
+  }
 }
 
 function drawFrog(ctx) 
@@ -145,6 +176,45 @@ function drawFrog(ctx)
   ctx.fillStyle = 'white'
   ctx.font = '16px Arial'
   ctx.fillText(currentNumber, frogX - 15, frogY + 5)
+}
+
+function drawRewardFrog(ctx) 
+{
+  // Draw frog in center
+  const centerX = 500
+  const centerY = 350
+  
+  ctx.beginPath()
+  ctx.arc(centerX, centerY, 40, 0, Math.PI * 2)
+  ctx.fillStyle = 'green'
+  ctx.fill()
+
+  // Draw eyes
+  ctx.beginPath()
+  ctx.arc(centerX - 15, centerY - 15, 5, 0, Math.PI * 2)
+  ctx.arc(centerX + 15, centerY - 15, 5, 0, Math.PI * 2)
+  ctx.fillStyle = 'white'
+  ctx.fill()
+
+  // Draw tongue if extended
+  if (tongueExtended) 
+  {
+    ctx.strokeStyle = 'red'
+    ctx.lineWidth = 4
+    ctx.beginPath()
+    ctx.moveTo(centerX, centerY)
+    ctx.lineTo(flyX, flyY)
+    ctx.stroke()
+  }
+}
+
+function drawFly(ctx) 
+{
+  if (!tongueExtended)
+  {
+    ctx.font = '24px Arial'
+    ctx.fillText('🪰', flyX - 12, flyY + 12)
+  }
 }
 
 function drawDistraction(ctx) 
@@ -180,7 +250,7 @@ function forcedFrogJump()
       nextcolumn++
       currentNumber += skipStep
       lives--
-
+      streak = 0
       if(lives<=0)
       {
         lives = 0
@@ -188,7 +258,6 @@ function forcedFrogJump()
       }
       break;
     }
-    
   }
 }
 
@@ -197,33 +266,57 @@ function drawHUD(ctx)
   ctx.fillStyle = 'black'
   ctx.font = '20px Arial'
   ctx.fillText(`Lives: ${lives}`, 850, 30)
+  ctx.fillText(`Streak: ${streak}`, 850, 60)
 }
 
 function generateLilypads() 
 {
+  if(firstCorrect == false)
+  {const correctNumber = currentNumber + skipStep
+    const wrongNumbers = new Set()
+    while (wrongNumbers.size < 2) 
+    {
+      const rand = correctNumber + Math.floor(Math.random() * 5) + 1
+      if (rand !== correctNumber) 
+        wrongNumbers.add(rand)
+    }
 
-  const correctNumber = currentNumber + skipStep * (1 + lilypads.length - nextcolumn)
-  const wrongNumbers = new Set()
-  while (wrongNumbers.size < 2) 
-  {
-    const rand = correctNumber + Math.floor(Math.random() * 5) + 1
-    if (rand !== correctNumber) 
-      wrongNumbers.add(rand)
+    const allNumbers = [correctNumber, ...wrongNumbers]
+    allNumbers.sort(() => Math.random() - 0.5)
+    const y = [130, 300, 480];
+
+    lilypads.push (y.map((height,i) => (
+    {
+      x: 500, 
+      y: height,
+      number: allNumbers[i],
+      isCorrect: allNumbers[i] == correctNumber
+    })))
   }
 
-  const allNumbers = [correctNumber, ...wrongNumbers]
-  allNumbers.sort(() => Math.random() - 0.5)
-  const y = [130, 300, 480];
-
-  lilypads.push (y.map((height,i) => (
+  else
   {
-    x: 1300,
-    y: height,
-    number: allNumbers[i],
-    isCorrect: allNumbers[i] === correctNumber
-  })))
+    const correctNumber = currentNumber + skipStep * (1 + lilypads.length - nextcolumn)
+    const wrongNumbers = new Set()
+    while (wrongNumbers.size < 2) 
+    {
+      const rand = correctNumber + Math.floor(Math.random() * 5) + 1
+      if (rand !== correctNumber) 
+        wrongNumbers.add(rand)
+    }
 
-  
+    const allNumbers = [correctNumber, ...wrongNumbers]
+    allNumbers.sort(() => Math.random() - 0.5)
+    const y = [130, 300, 480];
+
+    lilypads.push (y.map((height,i) => (
+    {
+      x: 1300,
+      y: height,
+      number: allNumbers[i],
+      isCorrect: allNumbers[i] == correctNumber
+    })))
+  }
 }
 
 function drawGameOver(ctx) 
@@ -255,6 +348,55 @@ function drawPauseGame(ctx)
   clearInterval(AttachBeepadTimer)
 }
 
+function drawRewardScreen(ctx) 
+{
+  showRewardContinue.value = true
+  
+  // Background
+  ctx.fillStyle = 'rgba(0,0,0,0.6)'
+  ctx.fillRect(0, 0, 1000, 680)
+
+  // Title
+  ctx.fillStyle = 'white'
+  ctx.font = '40px Arial'
+  ctx.fillText('Excellent!', 400, 150)
+  
+  ctx.font = '24px Arial'
+  ctx.fillText('You’re counting like a pro! Keep Going', 300, 200)
+
+  // Animate the frog catching the fly
+  rewardAnimationFrame++
+  
+  if (rewardAnimationFrame < 60) 
+  {
+    // Fly buzzes around
+    flyX = 500 + Math.sin(rewardAnimationFrame * 0.2) * 100
+    flyY = 200 + Math.cos(rewardAnimationFrame * 0.15) * 50
+    drawFly(ctx)
+  } 
+  else if (rewardAnimationFrame < 90) 
+  {
+    // Tongue extends
+    tongueExtended = true
+    drawFly(ctx)
+  } 
+  else if (rewardAnimationFrame < 120) 
+  {
+    // Fly caught, tongue retracts
+    tongueExtended = false
+  }
+  
+  drawRewardFrog(ctx)
+  
+  if (rewardAnimationFrame < 120) 
+  {
+    requestAnimationFrame(() => render())
+  }
+
+  clearInterval(lilypadTimer)
+  clearInterval(AttachBeepadTimer)
+}
+
 function pauseGame() 
 {
   pause = true
@@ -264,6 +406,26 @@ function resumeGame()
 {
   pause = false
   showResume.value = false
+
+  if(firstCorrect==true)
+  {
+    console.log(firstCorrect)
+    generateLilypads()
+    lilypadTimer = setInterval(generateLilypads, 5500)
+    AttachBeepadTimer = setInterval(AttachBeepad, Math.random() * 10000 + 2000)
+  }
+  render()
+}
+
+function continueGame() 
+{
+  showReward = false
+  showRewardContinue.value = false
+  rewardAnimationFrame = 0
+  tongueExtended = false
+  flyX = 500
+  flyY = 200
+  
   generateLilypads()
   lilypadTimer = setInterval(generateLilypads, 5500)
   AttachBeepadTimer = setInterval(AttachBeepad, Math.random() * 10000 + 2000)
@@ -274,6 +436,7 @@ function resetGame()
 {
   lives = 3
   gameOver = false
+  showReward = false
   currentNumber = 2
   frogX= 100
   frogY = 300
@@ -281,11 +444,17 @@ function resetGame()
   nextcolumn = 0
   stickpad = null
   showRetry.value = false
+  showRewardContinue.value = false
+  firstCorrect = false
+  streak = 0
+  rewardAnimationFrame = 0
+  tongueExtended = false
+  flyX = 500
+  flyY = 200
   updateJumpArc()
   render()
+  speed = 0.8
   generateLilypads()
-  lilypadTimer = setInterval(generateLilypads, 5500)
-  AttachBeepadTimer = setInterval(AttachBeepad, Math.random() * 10000 + 2000)
 }
 
 function updateJumpArc()
@@ -308,9 +477,7 @@ function updateJumpArc()
       jumping = false
     }
   }
-
   requestAnimationFrame(updateJumpArc)
-
 }
 
 function AttachBeepad()
@@ -340,6 +507,8 @@ function render()
     drawGameOver(ctx)
   else if (pause)
     drawPauseGame(ctx)
+  else if (showReward)
+    drawRewardScreen(ctx)
   else
     requestAnimationFrame(render)
  
@@ -349,15 +518,14 @@ onMounted(() =>
 {
   const canvas = gameCanvas.value
   
-  lilypadTimer = setInterval(generateLilypads, 5500)
   generateLilypads()
-  
-  AttachBeepadTimer = setInterval(AttachBeepad, Math.random() * 10000 + 2000) 
+ 
   render()
 
   canvas.addEventListener('mousedown', e => 
   {
-    if (jumping ||gameOver) 
+    
+    if (jumping ||gameOver || showReward) 
       return
 
     const rect = canvas.getBoundingClientRect()
@@ -376,6 +544,22 @@ onMounted(() =>
 
         if (pad.isCorrect) 
         {
+          streak++
+          
+          if (streak% 10 ==0 && streak > 0) {
+            showReward = true
+            speed += 0.2
+            streak = 0 // Reset streak after reward
+          } 
+    
+          if(firstCorrect == false)
+          {
+            firstCorrect = true
+            generateLilypads()
+            lilypadTimer = setInterval(generateLilypads, 5500)
+            AttachBeepadTimer = setInterval(AttachBeepad, Math.random() * 10000 + 2000)
+          }
+
           //go with the lilypad
           stickpad = pad
           nextcolumn++
@@ -385,7 +569,11 @@ onMounted(() =>
         }
         else
         {
+          streak = 0
+          if(pad == beepad)
+        {alert("You got distracted by a bee! Try again.")}
           lives -= 1
+          streak = 0
           if (lives <= 0)
           {
             lives =0

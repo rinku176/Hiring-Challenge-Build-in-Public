@@ -106,9 +106,17 @@ class Fly
   }
 }
 
+const GameState = {
+  GameNotStarted: 'GameNotStarted',
+  Playing: 'Playing',
+  Pause: 'Pause',
+  Reward: 'Reward',
+  GameOver: 'GameOver'
+}
+
 const frog = new Frog()
 const fly = new Fly()
-
+let currentGameState = GameState.GameNotStarted
 
 const gameCanvas = ref(null)
 const showRetry = ref(false)
@@ -120,12 +128,6 @@ let nextcolumn = 0
 let currentNumber = 2
 let skipStep = 2
 let speed = 0.8
-
-let gameOver = false
-let pause = false
-let showReward = false
-
-let firstCorrect = false // to check if the first correct lilypad is clicked
 
 const gravity = 0.5
 let beepad = null 
@@ -160,7 +162,7 @@ function drawLilypads(ctx)
     })
   })
 
-  if (firstCorrect)
+  if (currentGameState == GameState.Playing)
   { //to move the lilypads from right to left
     lilypads.forEach(set => 
     {
@@ -274,7 +276,7 @@ function forcedFrogJump()
       if(frog.lives<=0)
       {
         frog.lives = 0
-        gameOver = true
+        currentGameState = GameState.GameOver
       }
       break;
     }
@@ -291,7 +293,7 @@ function drawHUD(ctx)
 
 function generateLilypads() 
 {
-  if(firstCorrect == false)
+  if(currentGameState == GameState.GameNotStarted)
   {const correctNumber = currentNumber + skipStep
     const wrongNumbers = new Set()
     while (wrongNumbers.size < 2) 
@@ -419,17 +421,17 @@ function drawRewardScreen(ctx)
 
 function pauseGame() 
 {
-  pause = true
+  currentGameState = GameState.Pause
 }
 
 function resumeGame() 
 {
-  pause = false
+    currentGameState = GameState.Playing
+
   showResume.value = false
 
-  if(firstCorrect==true)
+  if(currentGameState == GameState.Playing)
   {
-    console.log(firstCorrect)
     generateLilypads()
     lilypadTimer = setInterval(generateLilypads, 5500)
     AttachBeepadTimer = setInterval(AttachBeepad, Math.random() * 10000 + 2000)
@@ -439,7 +441,7 @@ function resumeGame()
 
 function continueGame() 
 {
-  showReward = false
+  currentGameState = GameState.Playing
   showRewardContinue.value = false
   rewardAnimationFrame = 0
   fly.tongueExtended = false
@@ -455,8 +457,7 @@ function continueGame()
 function resetGame() 
 {
   frog.lives = 3
-  gameOver = false
-  showReward = false
+  currentGameState = GameState.GameNotStarted
   currentNumber = 2
   frog.x= 100
   frog.y = 300
@@ -465,7 +466,6 @@ function resetGame()
   frog.stickpad = null
   showRetry.value = false
   showRewardContinue.value = false
-  firstCorrect = false
   streak = 0
   rewardAnimationFrame = 0
   fly.tongueExtended = false
@@ -523,11 +523,11 @@ function render()
   if(beepad)
     drawDistraction(ctx)
 
-  if (gameOver) 
+  if (currentGameState == GameState.GameOver) 
     drawGameOver(ctx)
-  else if (pause)
+  else if (  currentGameState == GameState.Pause)
     drawPauseGame(ctx)
-  else if (showReward)
+  else if (currentGameState == GameState.Reward)
     drawRewardScreen(ctx)
   else
     requestAnimationFrame(render)
@@ -545,7 +545,7 @@ onMounted(() =>
   canvas.addEventListener('mousedown', e => 
   {
     
-    if (frog.jumping ||gameOver || showReward) 
+    if (frog.jumping ||currentGameState == GameState.GameOver || currentGameState == GameState.Reward) 
       return
 
     const rect = canvas.getBoundingClientRect()
@@ -567,14 +567,14 @@ onMounted(() =>
           streak++
           
           if (streak% 10 ==0 && streak > 0) {
-            showReward = true
+            currentGameState = GameState.Reward
             speed += 0.2
             streak = 0 // Reset streak after reward
           } 
     
-          if(firstCorrect == false)
+          if(currentGameState == GameState.GameNotStarted)
           {
-            firstCorrect = true
+            currentGameState = GameState.Playing
             generateLilypads()
             lilypadTimer = setInterval(generateLilypads, 5500)
             AttachBeepadTimer = setInterval(AttachBeepad, Math.random() * 10000 + 2000)
@@ -597,7 +597,7 @@ onMounted(() =>
           if (frog.lives <= 0)
           {
             frog.lives =0
-            gameOver = true
+            currentGameState = GameState.GameOver
           }
         }
         break;

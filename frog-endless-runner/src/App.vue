@@ -139,6 +139,31 @@ let streak = 0
 
 let rewardAnimationFrame = 0
 
+function drawPretty(canvas,ctx)
+{
+
+  // Draw water background with gradient
+  const waterGradient = ctx.createLinearGradient(0, 0, 0, canvas.height)
+  waterGradient.addColorStop(0, '#87CEEB')
+  waterGradient.addColorStop(0.3, '#4682B4')
+  waterGradient.addColorStop(1, '#2F4F4F')
+  ctx.fillStyle = waterGradient
+  ctx.fillRect(0, 0, canvas.width, canvas.height)
+
+  // Draw water ripples
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)'
+  ctx.lineWidth = 2
+  for (let i = 0; i < 5; i++) {
+    const y = 100 + i * 120
+    ctx.beginPath()
+    ctx.moveTo(0, y)
+    for (let x = 0; x < canvas.width; x += 20) {
+      ctx.lineTo(x, y + Math.sin(x * 0.01 + Date.now() * 0.001) * 5)
+    }
+    ctx.stroke()
+  }
+}
+
 function drawLilypads(ctx) 
 {
   ctx.font = '20px Arial'
@@ -181,7 +206,6 @@ function updateLilypadPosition()
 
 function drawFrog(ctx) 
 { 
-  
   ctx.beginPath()
   ctx.arc(frog.x, frog.y, 30, 0, Math.PI * 2)
   ctx.fillStyle = 'green'
@@ -364,7 +388,6 @@ function drawGameOver(ctx)
 
 function drawPauseGame(ctx) 
 {
-  
   showResume.value = true
   ctx.fillStyle = 'rgba(0,0,0,0.6)'
   ctx.fillRect(0, 0, 1000, 680)
@@ -500,10 +523,7 @@ function render()
   const canvas = gameCanvas.value
   const ctx = canvas.getContext('2d')
 
-  // Drawing
-  ctx.fillStyle = '#ccffcc'
-  ctx.fillRect(0, 0, canvas.width, canvas.height)
-
+  drawPretty(canvas,ctx)
   drawLilypads(ctx)
   drawFrog(ctx)
   drawHUD(ctx)

@@ -388,13 +388,50 @@ function forcedFrogJump()
     }
   }
 }
-
 function drawHUD(ctx) 
 {
-  ctx.fillStyle = 'black'
-  ctx.font = '20px Arial'
-  ctx.fillText(`Lives: ${frog.lives}`, 850, 30)
-  ctx.fillText(`Streak: ${streak}`, 850, 60)
+  // Draw hearts for lives 
+  const heartSize = 24
+  const heartSpacing = 35
+  const startX = 870
+  const startY = 30
+  
+  for (let i = 0; i < 3; i++) {
+    const heartX = startX + (i * heartSpacing)
+    const heartY = startY
+    
+    if (i < frog.lives) {
+      // Draw red hearts for lives
+      drawHeart(ctx, heartX, heartY, heartSize, true)
+    } else {
+      // Draw white hearts for lost lives
+      drawHeart(ctx, heartX, heartY, heartSize, false)
+    }
+  }
+  
+  // Draw streak counter
+  ctx.fillStyle = '#2C3E50'
+  ctx.font = 'bold 20px Arial'
+  ctx.fillText(`Streak: ${streak}`, 850, 70)
+}
+
+function drawHeart(ctx, x, y, size, filled) {
+  ctx.save()
+  ctx.translate(x, y)
+  
+  ctx.font = `${size}px Arial`
+  ctx.textAlign = 'center'
+  ctx.textBaseline = 'middle'
+  
+  if (filled) {
+    ctx.fillStyle = '#FF0000'
+    ctx.fillText('❤️', 0, 0)
+  } else {
+    ctx.fillStyle = '#CCCCCC'
+    ctx.fillText('🤍', 0, 0)
+  }
+  
+  ctx.restore()
 }
 
 function generateLilypads() 

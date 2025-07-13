@@ -95,7 +95,20 @@ class Frog
     this.lives = 3
   }
 }
+
+class Fly
+{
+  constructor() 
+  {
+    this.x = 500
+    this.y = 200
+    this.tongueExtended = false
+  }
+}
+
 const frog = new Frog()
+const fly = new Fly()
+
 
 const gameCanvas = ref(null)
 const showRetry = ref(false)
@@ -121,10 +134,8 @@ let AttachBeepadTimer = null
 let streak = 0
 
 // Reward animation variables
-let flyX = 500
-let flyY = 200
+
 let rewardAnimationFrame = 0
-let tongueExtended = false
 
 
 
@@ -205,23 +216,23 @@ function drawRewardFrog(ctx)
   ctx.fill()
 
   // Draw tongue if extended
-  if (tongueExtended) 
+  if (fly.tongueExtended) 
   {
     ctx.strokeStyle = 'red'
     ctx.lineWidth = 4
     ctx.beginPath()
     ctx.moveTo(centerX, centerY)
-    ctx.lineTo(flyX, flyY)
+    ctx.lineTo(fly.x, fly.y)
     ctx.stroke()
   }
 }
 
 function drawFly(ctx) 
 {
-  if (!tongueExtended)
+  if (!fly.tongueExtended)
   {
     ctx.font = '24px Arial'
-    ctx.fillText('🪰', flyX - 12, flyY + 12)
+    ctx.fillText('🪰', fly.x - 12, fly.y + 12)
   }
 }
 
@@ -378,20 +389,20 @@ function drawRewardScreen(ctx)
   if (rewardAnimationFrame < 60) 
   {
     // Fly buzzes around
-    flyX = 500 + Math.sin(rewardAnimationFrame * 0.2) * 100
-    flyY = 200 + Math.cos(rewardAnimationFrame * 0.15) * 50
+    fly.x = 500 + Math.sin(rewardAnimationFrame * 0.2) * 100
+    fly.y = 200 + Math.cos(rewardAnimationFrame * 0.15) * 50
     drawFly(ctx)
   } 
   else if (rewardAnimationFrame < 90) 
   {
     // Tongue extends
-    tongueExtended = true
+    fly.tongueExtended = true
     drawFly(ctx)
   } 
   else if (rewardAnimationFrame < 120) 
   {
     // Fly caught, tongue retracts
-    tongueExtended = false
+    fly.tongueExtended = false
   }
   
   drawRewardFrog(ctx)
@@ -430,9 +441,9 @@ function continueGame()
   showReward = false
   showRewardContinue.value = false
   rewardAnimationFrame = 0
-  tongueExtended = false
-  flyX = 500
-  flyY = 200
+  fly.tongueExtended = false
+  fly.x = 500
+  fly.y = 200
   
   generateLilypads()
   lilypadTimer = setInterval(generateLilypads, 5500)
@@ -456,9 +467,9 @@ function resetGame()
   firstCorrect = false
   streak = 0
   rewardAnimationFrame = 0
-  tongueExtended = false
-  flyX = 500
-  flyY = 200
+  fly.tongueExtended = false
+  fly.x = 500
+  fly.y = 200
   updateJumpArc()
   render()
   speed = 0.8

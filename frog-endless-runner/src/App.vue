@@ -416,11 +416,6 @@ function drawRewardScreen(ctx)
   }
   
   drawRewardFrog(ctx)
-  
-  // if (rewardAnimationFrame < 120) 
-  // {
-  //   requestAnimationFrame(() => render())
-  // }
 
   clearInterval(lilypadTimer)
   clearInterval(AttachBeepadTimer)
@@ -446,7 +441,7 @@ function resumeGame()
   lilypadTimer = setInterval(generateLilypads, 5500)
   AttachBeepadTimer = setInterval(AttachBeepad, Math.random() * 10000 + 2000)
   
-  //render()
+  
 }
 
 function resetGame() 
@@ -467,7 +462,6 @@ function resetGame()
   fly.x = 500
   fly.y = 200
   updateJumpArc()
-  //render()
   LilypadMovementSpeed = 0.8
   generateLilypads()
 }

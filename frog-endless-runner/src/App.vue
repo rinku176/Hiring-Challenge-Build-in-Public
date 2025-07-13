@@ -6,6 +6,7 @@
       <button v-if="!showResume" class="pause-btn" @click="pauseGame">Pause</button>
       <button v-if="showResume" class="resume-btn" @click="resumeGame">Resume</button>
       <button v-if="showRewardContinue" class="continue-btn" @click="continueGame">Continue</button>
+
     </div>
   </div>
 </template>
@@ -81,13 +82,25 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 
+class Frog
+{
+  constructor() 
+  {
+    this.x = 100
+    this.y = 300
+    this.stickpad = null
+    this.jumping = false
+    this.velocityX = 0
+    this.velocityY = 0
+    this.lives = 3
+  }
+}
+const frog = new Frog()
+
 const gameCanvas = ref(null)
 const showRetry = ref(false)
 const showResume = ref(false)
 const showRewardContinue = ref(false)
-
-let frogX = 100 // frog starts at the left
-let frogY = 300
 
 let lilypads = new Array()
 let nextcolumn = 0 
@@ -95,19 +108,13 @@ let currentNumber = 2
 let skipStep = 2
 let speed = 0.8
 
-let lives = 3
 let gameOver = false
 let pause = false
 let showReward = false
 
 let firstCorrect = false // to check if the first correct lilypad is clicked
-let targetX = frogX
-let targetY = frogY
-let jumping = false
-let velocityX = 0
-let velocityY = 0
+
 const gravity = 0.5
-let stickpad = null 
 let beepad = null 
 let lilypadTimer = null
 let AttachBeepadTimer = null
@@ -118,6 +125,7 @@ let flyX = 500
 let flyY = 200
 let rewardAnimationFrame = 0
 let tongueExtended = false
+
 
 
 function drawLilypads(ctx) 
@@ -159,23 +167,23 @@ function drawLilypads(ctx)
 
 function drawFrog(ctx) 
 { 
-  if (!jumping && stickpad)
+  if (!frog.jumping && frog.stickpad)
   {
-    frogX = stickpad.x
-    frogY = stickpad.y
+    frog.x = frog.stickpad.x
+    frog.y= frog.stickpad.y
   }
 
-  if ( frogX < 0)
+  if ( frog.x < 0)
     forcedFrogJump()
 
   ctx.beginPath()
-  ctx.arc(frogX, frogY, 30, 0, Math.PI * 2)
+  ctx.arc(frog.x, frog.y, 30, 0, Math.PI * 2)
   ctx.fillStyle = 'green'
   ctx.fill()
 
   ctx.fillStyle = 'white'
   ctx.font = '16px Arial'
-  ctx.fillText(currentNumber, frogX - 15, frogY + 5)
+  ctx.fillText(currentNumber, frog.x - 15, frog.y + 5)
 }
 
 function drawRewardFrog(ctx) 
@@ -224,18 +232,18 @@ function drawDistraction(ctx)
     ctx.fillText("🐝", beepad.x+10,beepad.y+20)
 }
 
-function jumpTo(x,y)
+function jumpTo(pad)
 {
-  if (jumping) 
+  frog.stickpad = pad
+
+  if (frog.jumping) 
     return
 
-  jumping = true
-  targetX = x
-  targetY = y
+  frog.jumping = true
 
   const frames = 20
-  velocityX = (targetX - frogX) / frames
-  velocityY = (targetY - frogY - 50) / frames // slight arc
+  frog.velocityX = (frog.stickpad.x - frog.x) / frames
+  frog.velocityY = (frog.stickpad.y - frog.y - 50) / frames // slight arc
 }
 
 function forcedFrogJump()
@@ -245,15 +253,15 @@ function forcedFrogJump()
   {
     if (pad.isCorrect) 
     {
-      jumpTo(pad.x, pad.y)
-      stickpad = pad
+      
+      jumpTo(pad)
       nextcolumn++
       currentNumber += skipStep
-      lives--
+      frog.lives--
       streak = 0
-      if(lives<=0)
+      if(frog.lives<=0)
       {
-        lives = 0
+        frog.lives = 0
         gameOver = true
       }
       break;
@@ -265,7 +273,7 @@ function drawHUD(ctx)
 {
   ctx.fillStyle = 'black'
   ctx.font = '20px Arial'
-  ctx.fillText(`Lives: ${lives}`, 850, 30)
+  ctx.fillText(`Lives: ${frog.lives}`, 850, 30)
   ctx.fillText(`Streak: ${streak}`, 850, 60)
 }
 
@@ -434,15 +442,15 @@ function continueGame()
 
 function resetGame() 
 {
-  lives = 3
+  frog.lives = 3
   gameOver = false
   showReward = false
   currentNumber = 2
-  frogX= 100
-  frogY = 300
+  frog.x= 100
+  frog.y = 300
   lilypads = new Array()
   nextcolumn = 0
-  stickpad = null
+  frog.stickpad = null
   showRetry.value = false
   showRewardContinue.value = false
   firstCorrect = false
@@ -459,22 +467,22 @@ function resetGame()
 
 function updateJumpArc()
 {
-  if (jumping) 
+  if (frog.jumping) 
   {
-    frogX += velocityX
-    frogY += velocityY
-    velocityY += gravity
+    frog.x += frog.velocityX
+    frog.y += frog.velocityY
+    frog.velocityY += gravity
 
     // Stop when near target
-    const dx = Math.abs(frogX - targetX)
-    const dy = Math.abs(frogY - targetY)
+    const dx = Math.abs(frog.x - frog.stickpad.x)
+    const dy = Math.abs(frog.y - frog.stickpad.y)
     if (dx < 50 && dy < 50) 
     {
-      frogX = targetX
-      frogY = targetY
-      velocityX = 0
-      velocityY = 0
-      jumping = false
+      frog.x = frog.stickpad.x
+      frog.y = frog.stickpad.y
+      frog.velocityX = 0
+      frog.velocityY = 0
+      frog.jumping = false
     }
   }
   requestAnimationFrame(updateJumpArc)
@@ -525,7 +533,7 @@ onMounted(() =>
   canvas.addEventListener('mousedown', e => 
   {
     
-    if (jumping ||gameOver || showReward) 
+    if (frog.jumping ||gameOver || showReward) 
       return
 
     const rect = canvas.getBoundingClientRect()
@@ -540,7 +548,7 @@ onMounted(() =>
 
       if (dist < 50) 
       { 
-        jumpTo(pad.x, pad.y)
+        jumpTo(pad)
 
         if (pad.isCorrect) 
         {
@@ -561,7 +569,7 @@ onMounted(() =>
           }
 
           //go with the lilypad
-          stickpad = pad
+          frog.stickpad = pad
           nextcolumn++
           currentNumber += skipStep
           
@@ -572,11 +580,11 @@ onMounted(() =>
           streak = 0
           if(pad == beepad)
         {alert("You got distracted by a bee! Try again.")}
-          lives -= 1
+          frog.lives -= 1
           streak = 0
-          if (lives <= 0)
+          if (frog.lives <= 0)
           {
-            lives =0
+            frog.lives =0
             gameOver = true
           }
         }

@@ -163,6 +163,81 @@ function drawPretty(canvas,ctx)
     ctx.stroke()
   }
 }
+function drawAnimatedPlants(ctx) {
+  const time = Date.now() * 0.001
+  const bottomY = 600 // Canvas height
+
+  // Draw kelp-like plants (gentle sway)
+  for (let i = 0; i < 15; i++) {
+    const x = (i * 67) + 35
+    const segments = 8
+    const segmentHeight = 15
+    
+    ctx.strokeStyle = '#006400'
+    ctx.lineWidth = 3
+    ctx.beginPath()
+    ctx.moveTo(x, bottomY)
+    
+    // Draw segmented kelp with gentle sway
+    for (let segment = 0; segment < segments; segment++) {
+      const segmentY = bottomY - (segment * segmentHeight)
+      const sway = Math.sin(time * 0.8 + segment * 0.3 + i * 0.2) * (segment * 2)
+      const segmentX = x + sway
+      
+      ctx.lineTo(segmentX, segmentY)
+      
+      // Add small side leaves every few segments
+      if (segment % 2 === 0 && segment > 0) {
+        ctx.save()
+        ctx.fillStyle = '#228B22'
+        
+        // Left leaf
+        ctx.beginPath()
+        ctx.ellipse(segmentX - 8, segmentY, 6, 12, -0.3, 0, Math.PI * 2)
+        ctx.fill()
+        
+        // Right leaf
+        ctx.beginPath()
+        ctx.ellipse(segmentX + 8, segmentY, 6, 12, 0.3, 0, Math.PI * 2)
+        ctx.fill()
+        
+        ctx.restore()
+      }
+    }
+    ctx.stroke()
+  }
+  
+  // Draw small ground plants
+  for (let i = 0; i < 25; i++) {
+    const x = (i * 40) + 15
+    const plantHeight = 25 + Math.sin(time * 0.4 + i) * 5
+    
+    ctx.strokeStyle = '#32CD32'
+    ctx.lineWidth = 2
+    
+    // Small grass-like plants
+    for (let blade = 0; blade < 3; blade++) {
+      const bladeX = x + (blade - 1) * 4
+      const bladeHeight = plantHeight - blade * 3
+      
+      ctx.beginPath()
+      ctx.moveTo(bladeX, bottomY)
+      ctx.lineTo(bladeX + Math.sin(time + blade + i) * 2, bottomY - bladeHeight)
+      ctx.stroke()
+    }
+  }
+  
+  // Draw floating algae particles (reduced and more natural)
+  ctx.fillStyle = 'rgba(46, 139, 87, 0.4)'
+  for (let i = 0; i < 20; i++) {
+    const particleX = (i * 50) + Math.sin(time * 0.3 + i) * 10
+    const particleY = 400 + Math.sin(time * 0.2 + i * 0.4) * 20
+    
+    ctx.beginPath()
+    ctx.arc(particleX, particleY, 1.5, 0, Math.PI * 2)
+    ctx.fill()
+  }
+}
 
 function drawLilypads(ctx) 
 {
@@ -524,6 +599,7 @@ function render()
   const ctx = canvas.getContext('2d')
 
   drawPretty(canvas,ctx)
+  drawAnimatedPlants(ctx)
   drawLilypads(ctx)
   drawFrog(ctx)
   drawHUD(ctx)

@@ -245,7 +245,8 @@ function drawDistraction(ctx)
 
 function jumpTo(pad)
 {
-  frog.stickpad = pad
+  if(pad.isCorrect)
+    frog.stickpad = pad
 
   if (frog.jumping) 
     return
@@ -587,7 +588,7 @@ onMounted(() =>
           console.log('Correct! Current number:', pad.number)
         }
         else
-        {
+        { 
           streak = 0
           if(pad == beepad)
         {alert("You got distracted by a bee! Try again.")}

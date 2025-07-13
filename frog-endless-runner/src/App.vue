@@ -5,7 +5,7 @@
       <button v-if="showRetry" class="retry-btn" @click="resetGame">Retry</button>
       <button v-if="!showResume" class="pause-btn" @click="pauseGame">Pause</button>
       <button v-if="showResume" class="resume-btn" @click="resumeGame">Resume</button>
-      <button v-if="showRewardContinue" class="continue-btn" @click="continueGame">Continue</button>
+      <button v-if="showRewardContinue" class="continue-btn" @click="resumeGame">Continue</button>
 
     </div>
   </div>
@@ -127,7 +127,7 @@ let lilypads = new Array()
 let nextcolumn = 0 
 let currentNumber = 2
 let skipStep = 2
-let speed = 0.8
+let LilypadMovementSpeed = 0.8
 
 const gravity = 0.5
 let beepad = null 
@@ -138,8 +138,6 @@ let streak = 0
 // Reward animation variables
 
 let rewardAnimationFrame = 0
-
-
 
 function drawLilypads(ctx) 
 {
@@ -160,14 +158,17 @@ function drawLilypads(ctx)
 
       ctx.restore()
     })
-  })
+  })  
+}
 
+function updateLilypadPosition()
+{
   if (currentGameState == GameState.Playing)
   { //to move the lilypads from right to left
     lilypads.forEach(set => 
     {
       set.forEach(pad =>
-        pad.x -= speed // speed of movement
+        pad.x -= LilypadMovementSpeed // speed of movement
         )
       if (set[0] < 0)
       {
@@ -180,15 +181,7 @@ function drawLilypads(ctx)
 
 function drawFrog(ctx) 
 { 
-  if (!frog.jumping && frog.stickpad)
-  {
-    frog.x = frog.stickpad.x
-    frog.y= frog.stickpad.y
-  }
-
-  if ( frog.x < 0)
-    forcedFrogJump()
-
+  
   ctx.beginPath()
   ctx.arc(frog.x, frog.y, 30, 0, Math.PI * 2)
   ctx.fillStyle = 'green'
@@ -197,6 +190,21 @@ function drawFrog(ctx)
   ctx.fillStyle = 'white'
   ctx.font = '16px Arial'
   ctx.fillText(currentNumber, frog.x - 15, frog.y + 5)
+}
+
+function updateFrogPosition()
+{
+  //to move frog along with the lilypad
+  if (!frog.jumping && frog.stickpad)
+  {
+    frog.x = frog.stickpad.x
+    frog.y= frog.stickpad.y
+  }
+
+  //to make the frog jump before it runs out of the screen
+  if ( frog.x < 0)
+    forcedFrogJump()
+
 }
 
 function drawRewardFrog(ctx) 
@@ -262,7 +270,6 @@ function jumpTo(pad)
 
 function forcedFrogJump()
 {
- 
   for (let pad of lilypads[nextcolumn])
   {
     if (pad.isCorrect) 
@@ -410,10 +417,10 @@ function drawRewardScreen(ctx)
   
   drawRewardFrog(ctx)
   
-  if (rewardAnimationFrame < 120) 
-  {
-    requestAnimationFrame(() => render())
-  }
+  // if (rewardAnimationFrame < 120) 
+  // {
+  //   requestAnimationFrame(() => render())
+  // }
 
   clearInterval(lilypadTimer)
   clearInterval(AttachBeepadTimer)
@@ -426,32 +433,20 @@ function pauseGame()
 
 function resumeGame() 
 {
-    currentGameState = GameState.Playing
-
-  showResume.value = false
-
-  if(currentGameState == GameState.Playing)
-  {
-    generateLilypads()
-    lilypadTimer = setInterval(generateLilypads, 5500)
-    AttachBeepadTimer = setInterval(AttachBeepad, Math.random() * 10000 + 2000)
-  }
-  render()
-}
-
-function continueGame() 
-{
   currentGameState = GameState.Playing
+  showResume.value = false
   showRewardContinue.value = false
+
   rewardAnimationFrame = 0
   fly.tongueExtended = false
   fly.x = 500
   fly.y = 200
-  
+
   generateLilypads()
   lilypadTimer = setInterval(generateLilypads, 5500)
   AttachBeepadTimer = setInterval(AttachBeepad, Math.random() * 10000 + 2000)
-  render()
+  
+  //render()
 }
 
 function resetGame() 
@@ -472,8 +467,8 @@ function resetGame()
   fly.x = 500
   fly.y = 200
   updateJumpArc()
-  render()
-  speed = 0.8
+  //render()
+  LilypadMovementSpeed = 0.8
   generateLilypads()
 }
 
@@ -497,7 +492,6 @@ function updateJumpArc()
       frog.jumping = false
     }
   }
-  requestAnimationFrame(updateJumpArc)
 }
 
 function AttachBeepad()
@@ -522,16 +516,27 @@ function render()
   
   if(beepad)
     drawDistraction(ctx)
-
   if (currentGameState == GameState.GameOver) 
     drawGameOver(ctx)
   else if (  currentGameState == GameState.Pause)
     drawPauseGame(ctx)
   else if (currentGameState == GameState.Reward)
     drawRewardScreen(ctx)
-  else
-    requestAnimationFrame(render)
+  
+  requestAnimationFrame(render)
  
+}
+
+function gameUpdate()
+{
+  //to move the lilypads from right to left
+  updateLilypadPosition()
+  //to make the frog jump along with the lilypad or before it runs out of the screen
+  updateFrogPosition()
+  updateJumpArc()
+
+  requestAnimationFrame(gameUpdate)
+  
 }
 
 onMounted(() => 
@@ -541,7 +546,8 @@ onMounted(() =>
   generateLilypads()
  
   render()
-
+  gameUpdate()
+  
   canvas.addEventListener('mousedown', e => 
   {
     
@@ -568,7 +574,7 @@ onMounted(() =>
           
           if (streak% 10 ==0 && streak > 0) {
             currentGameState = GameState.Reward
-            speed += 0.2
+            LilypadMovementSpeed += 0.2
             streak = 0 // Reset streak after reward
           } 
     

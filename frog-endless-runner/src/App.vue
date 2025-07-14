@@ -161,8 +161,8 @@ function drawPretty(canvas,ctx)
 
 function drawAnimatedPlants(ctx) 
 {
-  
-  const bottomY = 600 //canvas height 
+  const canvas = gameCanvas.value
+  const bottomY = canvas.clientTop + canvas.clientHeight 
   const time = Date.now() * 0.001
 
   // Draw kelp-like plants 
@@ -170,21 +170,19 @@ function drawAnimatedPlants(ctx)
   {
     const x = (i * 67) + 35
     const segments = 8
-    const segmentHeight = 15
+    const segmentHeight = 0.014 * canvas.clientWidth
     
     ctx.strokeStyle = '#006400'
     ctx.lineWidth = 3
     ctx.beginPath()
-    ctx.moveTo(x, bottomY)
     
-    // Draw segmented kelp  
+    // Draw segmented kelp
     for (let segment = 0; segment < segments; segment++) 
     {
       const segmentY = bottomY - (segment * segmentHeight)
       const sway = Math.sin(time * 0.8 + segment * 0.3 + i * 0.2) * (segment * 2)
       const segmentX = x + sway
-      
-      ctx.lineTo(segmentX, segmentY)
+      const leafRadiusx = 0.007 * canvas.clientWidth
       
       // Add small side leaves every few segments
       if (segment % 2 === 0 && segment > 0) 
@@ -194,12 +192,12 @@ function drawAnimatedPlants(ctx)
         
         // Left leaf
         ctx.beginPath()
-        ctx.ellipse(segmentX - 8, segmentY, 6, 12, -0.3, 0, Math.PI * 2)
+        ctx.ellipse(segmentX - 7, segmentY+5, leafRadiusx, leafRadiusx*2, -0.3, 0, Math.PI * 2)
         ctx.fill()
         
         // Right leaf
         ctx.beginPath()
-        ctx.ellipse(segmentX + 8, segmentY, 6, 12, 0.3, 0, Math.PI * 2)
+        ctx.ellipse(segmentX + 7, segmentY+5, leafRadiusx, leafRadiusx *2, 0.3, 0, Math.PI * 2)
         ctx.fill()
         
         ctx.restore()
@@ -229,8 +227,7 @@ function drawAnimatedPlants(ctx)
       ctx.stroke()
     }
   }
-  
- 
+
 }
 
 function drawLilypads(ctx) 

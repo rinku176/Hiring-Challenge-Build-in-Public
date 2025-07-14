@@ -97,6 +97,17 @@ class Fly
   }
 }
 
+class Lilypad
+{
+  constructor(x, y, number, isCorrect) 
+  {
+    this.x = x
+    this.y = y
+    this.number = number
+    this.isCorrect = isCorrect
+  }
+}
+
 const GameState = {
   GameNotStarted: 'GameNotStarted',
   Playing: 'Playing',
@@ -233,6 +244,7 @@ function drawAnimatedPlants(ctx)
 function drawLilypads(ctx) 
 {
   ctx.font = '20px Arial'
+  let drawleafRadiusY = 0.07482 * ctx.canvas.clientHeight
   lilypads.forEach(set => 
   {
     set.forEach(pad =>
@@ -241,7 +253,7 @@ function drawLilypads(ctx)
 
       ctx.fillStyle = '#339966'
       ctx.beginPath()
-      ctx.ellipse(pad.x, pad.y, 50, 40, 0, 0, Math.PI * 2)
+      ctx.ellipse(pad.x, pad.y, drawleafRadiusY * 1.25, drawleafRadiusY, 0, 0, Math.PI * 2)
       ctx.fill()
 
       ctx.fillStyle = 'white'
@@ -427,6 +439,8 @@ function drawHeart(ctx, x, y, size, filled) {
 
 function generateLilypads() 
 {
+    const canvas = gameCanvas.value
+
   if(currentGameState == GameState.GameNotStarted)
   {const correctNumber = currentNumber + skipStep
     const wrongNumbers = new Set()
@@ -439,21 +453,24 @@ function generateLilypads()
 
     const allNumbers = [correctNumber, ...wrongNumbers]
     allNumbers.sort(() => Math.random() - 0.5)
-    const y = [130, 300, 480];
+    let x = canvas.clientWidth * 0.5
+    let lilypadColumn = new Array()
 
-    lilypads.push (y.map((height,i) => (
+    for (let i = 0; i < 3; i++)
     {
-      x: 500, 
-      y: height,
-      number: allNumbers[i],
-      isCorrect: allNumbers[i] == correctNumber
-    })))
+      let y = canvas.clientHeight * 0.66 * ((i +1) / 3.0)
+      lilypadColumn.push(new Lilypad(x, y, allNumbers[i], allNumbers[i] == correctNumber))
+    }
+
+    lilypads.push(lilypadColumn)
   }
 
   else
   {
     const correctNumber = currentNumber + skipStep * (1 + lilypads.length - nextcolumn)
     const wrongNumbers = new Set()
+    let x = canvas.clientWidth * 1.28662
+
     while (wrongNumbers.size < 2) 
     {
       const rand = correctNumber + Math.floor(Math.random() * 5) + 1
@@ -463,15 +480,14 @@ function generateLilypads()
 
     const allNumbers = [correctNumber, ...wrongNumbers]
     allNumbers.sort(() => Math.random() - 0.5)
-    const y = [130, 300, 480];
+    let lilypadColumn = new Array()
 
-    lilypads.push (y.map((height,i) => (
+    for (let i = 0; i < 3; i++)
     {
-      x: 1300,
-      y: height,
-      number: allNumbers[i],
-      isCorrect: allNumbers[i] == correctNumber
-    })))
+      let y = canvas.clientHeight * 0.66 * ((i +1)/ 3.0)
+      lilypadColumn.push(Lilypad(x, y, allNumbers[i], allNumbers[i] == correctNumber))
+    }
+    lilypads.push(lilypadColumn)
   }
 }
 

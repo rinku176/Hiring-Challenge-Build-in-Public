@@ -54,11 +54,12 @@
 .continue-btn 
 {
   position: absolute;
-  top: 400px; /* Below reward screen text */
-  left: 50%;
-  transform: translateX(-50%);
-  padding: 10px 20px;
   font-size: 18px;
+  height: 3rem;
+  width: 7rem;
+  top: calc(70% - 4rem);
+left: calc(50% - 4rem);
+transform: translate(-50%, -50%);
   background-color: #3498db;
   color: white;
   border-radius: 8px;
@@ -312,18 +313,18 @@ function updateFrogPosition()
 function drawRewardFrog(ctx) 
 {
   // Draw frog in center
-  const centerX = 500
-  const centerY = 350
+  const centerX = 0.5 * ctx.canvas.clientWidth
+  const centerY = 0.48 * ctx.canvas.clientHeight
   
   ctx.beginPath()
-  ctx.arc(centerX, centerY, 40, 0, Math.PI * 2)
+  ctx.arc(centerX, centerY, 0.05 * ctx.canvas.clientHeight, 0, Math.PI * 2)
   ctx.fillStyle = 'green'
   ctx.fill()
 
   // Draw eyes
   ctx.beginPath()
-  ctx.arc(centerX - 15, centerY - 15, 5, 0, Math.PI * 2)
-  ctx.arc(centerX + 15, centerY - 15, 5, 0, Math.PI * 2)
+  ctx.arc(centerX - (0.02056 *ctx.canvas.clientHeight), centerY - (0.02056 *ctx.canvas.clientHeight), 0.0068 *ctx.canvas.clientHeight, 0, Math.PI * 2)
+  ctx.arc(centerX + (0.02056 *ctx.canvas.clientHeight), centerY - (0.02056 *ctx.canvas.clientHeight), 0.0068 *ctx.canvas.clientHeight, 0, Math.PI * 2)
   ctx.fillStyle = 'white'
   ctx.fill()
 
@@ -343,7 +344,7 @@ function drawFly(ctx)
 {
   if (!fly.tongueExtended)
   {
-    ctx.font = '24px Arial'
+    ctx.font = '1.5rem Arial'
     ctx.fillText('🪰', fly.x - 12, fly.y + 12)
   }
 }
@@ -523,15 +524,16 @@ function drawRewardScreen(ctx)
   
   // Background
   ctx.fillStyle = 'rgba(0,0,0,0.6)'
-  ctx.fillRect(0, 0, 1000, 680)
+  ctx.fillRect(0, 0, ctx.canvas.clientWidth, ctx.canvas.clientHeight)
 
   // Title
   ctx.fillStyle = 'white'
-  ctx.font = '40px Arial'
-  ctx.fillText('Excellent!', 400, 150)
+  ctx.font = '1.8rem Arial'
+  ctx.textAlign = "center"
+  ctx.fillText('Excellent!', 0.5 * ctx.canvas.clientWidth, 0.2 * ctx.canvas.clientHeight)
   
-  ctx.font = '24px Arial'
-  ctx.fillText('You’re counting like a pro! Keep Going', 300, 200)
+  ctx.font = '1.2rem Arial'
+  ctx.fillText('You’re counting like a pro! Keep Going', 0.5 * ctx.canvas.clientWidth, 0.27 * ctx.canvas.clientHeight)
 
   // Animate the frog catching the fly
   rewardAnimationFrame++
@@ -539,8 +541,8 @@ function drawRewardScreen(ctx)
   if (rewardAnimationFrame < 60) 
   {
     // Fly buzzes around
-    fly.x = 500 + Math.sin(rewardAnimationFrame * 0.2) * 100
-    fly.y = 200 + Math.cos(rewardAnimationFrame * 0.15) * 50
+    fly.x = 0.5* ctx.canvas.clientWidth + Math.sin(rewardAnimationFrame * 0.2) * 100
+    fly.y = 0.27 * ctx.canvas.clientHeight + Math.cos(rewardAnimationFrame * 0.15) * 50
     drawFly(ctx)
   } 
   else if (rewardAnimationFrame < 90) 
@@ -643,6 +645,9 @@ function render()
   const canvas = gameCanvas.value
   const ctx = canvas.getContext('2d')
 
+  let dynamicFontSize = 0.03193 * screenHeight
+  document.querySelector(":root").style.fontSize = dynamicFontSize + "px"
+
   drawPretty(canvas,ctx)
   drawAnimatedPlants(ctx)
   drawLilypads(ctx)
@@ -707,7 +712,7 @@ onMounted(() =>
         {
           streak++
           
-          if (streak% 10 ==0 && streak > 0) {
+          if (streak% 2 ==0 && streak > 0) {
             currentGameState = GameState.Reward
             LilypadMovementSpeed += 0.2
             streak = 0 // Reset streak after reward

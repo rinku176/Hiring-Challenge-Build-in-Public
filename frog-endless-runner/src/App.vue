@@ -396,8 +396,8 @@ function drawHUD(ctx)
   // Draw hearts for lives 
   const heartSize = 24
   const heartSpacing = 35
-  const startX = 870
-  const startY = 30
+  const startX = 0.86105 * ctx.canvas.clientWidth
+  const startY = 0.05112 * ctx.canvas.clientHeight
   
   for (let i = 0; i < 3; i++) {
     const heartX = startX + (i * heartSpacing)

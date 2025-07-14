@@ -77,8 +77,8 @@ class Frog
 {
   constructor() 
   {
-    this.x = 100
-    this.y = 300
+    this.x = 0.1 * document.documentElement.clientWidth
+    this.y = 0.4 * document.documentElement.clientHeight
     this.stickpad = null
     this.jumping = false
     this.velocityX = 0
@@ -285,7 +285,7 @@ function updateLilypadPosition()
 function drawFrog(ctx) 
 { 
   ctx.beginPath()
-  ctx.arc(frog.x, frog.y, 30, 0, Math.PI * 2)
+  ctx.arc(frog.x, frog.y, 0.06 * ctx.canvas.clientHeight, 0, Math.PI * 2)
   ctx.fillStyle = 'green'
   ctx.fill()
 

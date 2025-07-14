@@ -1,41 +1,32 @@
 <template>
-  <div class="page-view">
-    <div class="page-container">
-      <canvas ref="gameCanvas" width="1000" height="600" style="border: 2px solid green;"></canvas>
+
+      <canvas ref="gameCanvas" v-bind:width="screenWidth * 0.8" v-bind:height="screenHeight * 0.8" class="canvas-class" style="border: 2px solid green;"></canvas>
       <button v-if="showRetry" class="retry-btn" @click="resetGame">Retry</button>
       <button v-if="!showResume" class="pause-btn" @click="pauseGame">Pause</button>
       <button v-if="showResume" class="resume-btn" @click="resumeGame">Resume</button>
       <button v-if="showRewardContinue" class="continue-btn" @click="resumeGame">Continue</button>
 
-    </div>
-  </div>
+ 
 </template>
 
 <style scoped>
-.page-view 
+.canvas-class 
 {
-  display: flex;
-  justify-content: center;
-  margin-top: 20px;
-}
-
-.page-container 
-{
-  position: relative;
-  width: 1000px;
-  height: 630px;
+  position: absolute;
+  top: 2rem;
+  left: 2rem;
 }
 
 .pause-btn, .resume-btn
 {
   position: absolute;
-  top: 20px; 
-  left: 20px;
-  padding: 10px 20px;
+  top: 3rem; 
+  left: 3rem;
+  height: 3rem;
+  width: 7rem;
   font-size: 18px;
   background-color: #ab2a93;
   color: white;
-  border-radius: 8px;
 }
 
 .pause-btn:hover , .resume-btn:hover
@@ -116,12 +107,17 @@ const GameState = {
 
 const frog = new Frog()
 const fly = new Fly()
-let currentGameState = GameState.GameNotStarted
 
 const gameCanvas = ref(null)
 const showRetry = ref(false)
 const showResume = ref(false)
 const showRewardContinue = ref(false)
+
+const gravity = 0.5
+let screenWidth = document.documentElement.clientWidth
+let screenHeight = document.documentElement.clientHeight
+
+let currentGameState = GameState.GameNotStarted
 
 let lilypads = new Array()
 let nextcolumn = 0 
@@ -129,7 +125,6 @@ let currentNumber = 2
 let skipStep = 2
 let LilypadMovementSpeed = 0.8
 
-const gravity = 0.5
 let beepad = null 
 let lilypadTimer = null
 let AttachBeepadTimer = null
@@ -163,12 +158,16 @@ function drawPretty(canvas,ctx)
     ctx.stroke()
   }
 }
-function drawAnimatedPlants(ctx) {
-  const time = Date.now() * 0.001
-  const bottomY = 600 // Canvas height
 
-  // Draw kelp-like plants (gentle sway)
-  for (let i = 0; i < 15; i++) {
+function drawAnimatedPlants(ctx) 
+{
+  
+  const bottomY = 600 //canvas height 
+  const time = Date.now() * 0.001
+
+  // Draw kelp-like plants 
+  for (let i = 0; i < 15; i++) 
+  {
     const x = (i * 67) + 35
     const segments = 8
     const segmentHeight = 15
@@ -178,8 +177,9 @@ function drawAnimatedPlants(ctx) {
     ctx.beginPath()
     ctx.moveTo(x, bottomY)
     
-    // Draw segmented kelp with gentle sway
-    for (let segment = 0; segment < segments; segment++) {
+    // Draw segmented kelp  
+    for (let segment = 0; segment < segments; segment++) 
+    {
       const segmentY = bottomY - (segment * segmentHeight)
       const sway = Math.sin(time * 0.8 + segment * 0.3 + i * 0.2) * (segment * 2)
       const segmentX = x + sway
@@ -187,7 +187,8 @@ function drawAnimatedPlants(ctx) {
       ctx.lineTo(segmentX, segmentY)
       
       // Add small side leaves every few segments
-      if (segment % 2 === 0 && segment > 0) {
+      if (segment % 2 === 0 && segment > 0) 
+      {
         ctx.save()
         ctx.fillStyle = '#228B22'
         
@@ -208,7 +209,8 @@ function drawAnimatedPlants(ctx) {
   }
   
   // Draw small ground plants
-  for (let i = 0; i < 25; i++) {
+  for (let i = 0; i < 25; i++) 
+  {
     const x = (i * 40) + 15
     const plantHeight = 25 + Math.sin(time * 0.4 + i) * 5
     
@@ -216,7 +218,8 @@ function drawAnimatedPlants(ctx) {
     ctx.lineWidth = 2
     
     // Small grass-like plants
-    for (let blade = 0; blade < 3; blade++) {
+    for (let blade = 0; blade < 3; blade++) 
+    {
       const bladeX = x + (blade - 1) * 4
       const bladeHeight = plantHeight - blade * 3
       
@@ -227,16 +230,7 @@ function drawAnimatedPlants(ctx) {
     }
   }
   
-  // Draw floating algae particles (reduced and more natural)
-  ctx.fillStyle = 'rgba(46, 139, 87, 0.4)'
-  for (let i = 0; i < 20; i++) {
-    const particleX = (i * 50) + Math.sin(time * 0.3 + i) * 10
-    const particleY = 400 + Math.sin(time * 0.2 + i * 0.4) * 20
-    
-    ctx.beginPath()
-    ctx.arc(particleX, particleY, 1.5, 0, Math.PI * 2)
-    ctx.fill()
-  }
+ 
 }
 
 function drawLilypads(ctx) 
@@ -632,6 +626,9 @@ function AttachBeepad()
 
 function render()
 {
+  screenWidth = document.documentElement.clientWidth
+  screenHeight = document.documentElement.clientHeight
+
   const canvas = gameCanvas.value
   const ctx = canvas.getContext('2d')
 

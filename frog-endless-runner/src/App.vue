@@ -439,7 +439,8 @@ function generateLilypads()
     const canvas = gameCanvas.value
 
   if(currentGameState == GameState.GameNotStarted)
-  {const correctNumber = currentNumber + skipStep
+  {
+    const correctNumber = currentNumber + skipStep
     const wrongNumbers = new Set()
     while (wrongNumbers.size < 2) 
     {
@@ -482,7 +483,7 @@ function generateLilypads()
     for (let i = 0; i < 3; i++)
     {
       let y = canvas.clientHeight * 0.66 * ((i +1)/ 3.0)
-      lilypadColumn.push(Lilypad(x, y, allNumbers[i], allNumbers[i] == correctNumber))
+      lilypadColumn.push(new Lilypad(x, y, allNumbers[i], allNumbers[i] == correctNumber))
     }
     lilypads.push(lilypadColumn)
   }

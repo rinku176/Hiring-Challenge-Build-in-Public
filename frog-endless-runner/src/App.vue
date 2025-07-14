@@ -412,10 +412,7 @@ function drawHUD(ctx)
     }
   }
   
-  // Draw streak counter
-  ctx.fillStyle = '#2C3E50'
-  ctx.font = 'bold 20px Arial'
-  ctx.fillText(`Streak: ${streak}`, 850, 70)
+
 }
 
 function drawHeart(ctx, x, y, size, filled) {

@@ -72,7 +72,7 @@ transform: translate(-50%, -50%);
 </style>
 
 <script setup>
-import { onMounted, ref } from 'vue'
+import { h, onMounted, ref } from 'vue'
 
 class Frog
 {
@@ -397,7 +397,7 @@ function drawHUD(ctx)
   // Draw hearts for lives 
   const heartSize = 24
   const heartSpacing = 35
-  const startX = 0.86105 * ctx.canvas.clientWidth
+  const startX = ctx.canvas.clientWidth - heartSize *3 - heartSpacing
   const startY = 0.05112 * ctx.canvas.clientHeight
   
   for (let i = 0; i < 3; i++) {

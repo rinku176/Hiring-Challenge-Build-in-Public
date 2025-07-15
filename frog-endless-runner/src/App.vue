@@ -35,10 +35,12 @@
 .retry-btn 
 {
   position: absolute;
-  top: 360px; /* Below 'Game Over' canvas text */
-  transform: translateX(-50%);
-  padding: 10px 20px;
   font-size: 18px;
+  height: 3rem;
+  width: 7rem;
+  top: calc(70% - 4rem);
+  left: calc(50% - 4rem);
+  transform: translate(-50%, -50%);
   background-color: #2ecc71;
   color: white;
   border-radius: 8px;
@@ -492,11 +494,11 @@ function drawGameOver(ctx)
 {
   showRetry.value = true
   ctx.fillStyle = 'rgba(0,0,0,0.6)'
-  ctx.fillRect(0, 0, 1000, 680)
+  ctx.fillRect(0, 0, ctx.canvas.clientWidth, ctx.canvas.clientHeight)
 
   ctx.fillStyle = 'white'
   ctx.font = '1.8rem Arial'
-  ctx.fillText('Game Over', 400, 300)
+  ctx.fillText('Game Over', 0.4* ctx.canvas.clientWidth, 0.42 * ctx.canvas.clientHeight)
 
   clearInterval(lilypadTimer)
   clearInterval(AttachBeepadTimer)

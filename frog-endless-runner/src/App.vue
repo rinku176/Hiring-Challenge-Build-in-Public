@@ -497,7 +497,7 @@ function drawGameOver(ctx)
   ctx.fillRect(0, 0, 1000, 680)
 
   ctx.fillStyle = 'white'
-  ctx.font = '40px Arial'
+  ctx.font = '1.8rem Arial'
   ctx.fillText('Game Over', 400, 300)
 
   clearInterval(lilypadTimer)
@@ -508,11 +508,11 @@ function drawPauseGame(ctx)
 {
   showResume.value = true
   ctx.fillStyle = 'rgba(0,0,0,0.6)'
-  ctx.fillRect(0, 0, 1000, 680)
+  ctx.fillRect(0, 0, ctx.canvas.clientWidth, ctx.canvas.clientHeight)
 
   ctx.fillStyle = 'white'
-  ctx.font = '40px Arial'
-  ctx.fillText('Game Paused', 400, 300)
+  ctx.font = '1.8rem Arial'
+  ctx.fillText('Game Paused', 0.4* ctx.canvas.clientWidth, 0.42 * ctx.canvas.clientHeight)
 
   clearInterval(lilypadTimer)
   clearInterval(AttachBeepadTimer)

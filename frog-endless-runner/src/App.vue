@@ -435,6 +435,29 @@ function drawHeart(ctx, x, y, size, filled) {
   ctx.restore()
 }
 
+  // titleX, titleY,bodyX and bodyYare relative positions to the screen
+function drawScreenOverlay(ctx,title,body = "",titleX = 0.5,titleY = 0.45, bodyX =0.5,bodyY= 0.27)
+{
+  showResume.value = (currentGameState == GameState.Pause)
+  showRetry.value = (currentGameState == GameState.GameOver)
+  showRewardContinue.value = (currentGameState == GameState.Reward)
+
+  ctx.textAlign = 'center'
+
+  ctx.fillStyle = 'rgba(0,0,0,0.6)'
+  ctx.fillRect(0, 0, ctx.canvas.clientWidth, ctx.canvas.clientHeight)
+
+  ctx.fillStyle = 'white'
+  ctx.font = '1.8rem Arial'
+  ctx.fillText(title, titleX* ctx.canvas.clientWidth, titleY * ctx.canvas.clientHeight)
+
+  ctx.font = '1.2rem Arial'
+  ctx.fillText(body, bodyX * ctx.canvas.clientWidth, bodyY * ctx.canvas.clientHeight)
+
+  clearInterval(lilypadTimer)
+  clearInterval(AttachBeepadTimer)
+}
+
 function generateLilypads() 
 {
     const canvas = gameCanvas.value
@@ -490,50 +513,9 @@ function generateLilypads()
   }
 }
 
-function drawGameOver(ctx) 
-{
-  showRetry.value = true
-  ctx.fillStyle = 'rgba(0,0,0,0.6)'
-  ctx.fillRect(0, 0, ctx.canvas.clientWidth, ctx.canvas.clientHeight)
-
-  ctx.fillStyle = 'white'
-  ctx.font = '1.8rem Arial'
-  ctx.fillText('Game Over', 0.4* ctx.canvas.clientWidth, 0.42 * ctx.canvas.clientHeight)
-
-  clearInterval(lilypadTimer)
-  clearInterval(AttachBeepadTimer)
-}
-
-function drawPauseGame(ctx) 
-{
-  showResume.value = true
-  ctx.fillStyle = 'rgba(0,0,0,0.6)'
-  ctx.fillRect(0, 0, ctx.canvas.clientWidth, ctx.canvas.clientHeight)
-
-  ctx.fillStyle = 'white'
-  ctx.font = '1.8rem Arial'
-  ctx.fillText('Game Paused', 0.4* ctx.canvas.clientWidth, 0.42 * ctx.canvas.clientHeight)
-
-  clearInterval(lilypadTimer)
-  clearInterval(AttachBeepadTimer)
-}
-
 function drawRewardScreen(ctx) 
 {
-  showRewardContinue.value = true
-  
-  // Background
-  ctx.fillStyle = 'rgba(0,0,0,0.6)'
-  ctx.fillRect(0, 0, ctx.canvas.clientWidth, ctx.canvas.clientHeight)
-
-  // Title
-  ctx.fillStyle = 'white'
-  ctx.font = '1.8rem Arial'
-  ctx.textAlign = "center"
-  ctx.fillText('Excellent!', 0.5 * ctx.canvas.clientWidth, 0.2 * ctx.canvas.clientHeight)
-  
-  ctx.font = '1.2rem Arial'
-  ctx.fillText('You’re counting like a pro! Keep Going', 0.5 * ctx.canvas.clientWidth, 0.27 * ctx.canvas.clientHeight)
+  drawScreenOverlay(ctx, 'Excellent!', 'You’re counting like a pro! Keep Going',0.5,0.2,0.5,0.27)
 
   // Animate the frog catching the fly
   rewardAnimationFrame++
@@ -559,8 +541,6 @@ function drawRewardScreen(ctx)
   
   drawRewardFrog(ctx)
 
-  clearInterval(lilypadTimer)
-  clearInterval(AttachBeepadTimer)
 }
 
 function pauseGame() 
@@ -657,9 +637,9 @@ function render()
   if(beepad)
     drawDistraction(ctx)
   if (currentGameState == GameState.GameOver) 
-    drawGameOver(ctx)
+    drawScreenOverlay(ctx, 'Game Over')
   else if (  currentGameState == GameState.Pause)
-    drawPauseGame(ctx)
+    drawScreenOverlay(ctx,'Game Paused')
   else if (currentGameState == GameState.Reward)
     drawRewardScreen(ctx)
   

@@ -22,9 +22,7 @@
   position: absolute;
   top: 3rem; 
   left: 3rem;
-  height: 3rem;
-  width: 7rem;
-  font-size: 18px;
+  font-size: 1rem;
   background-color: #ab2a93;
   color: white;
 }

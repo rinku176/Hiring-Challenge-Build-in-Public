@@ -178,7 +178,7 @@ function drawAnimatedPlants(ctx)
   const time = Date.now() * 0.001
 
   // Draw kelp-like plants 
-  for (let i = 0; i < 15; i++) 
+  for (let i = 0; i < 30; i++) 
   {
     const x = (i * 67) + 35
     const segments = 8

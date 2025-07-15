@@ -114,7 +114,8 @@ const GameState = {
   Playing: 'Playing',
   Pause: 'Pause',
   Reward: 'Reward',
-  GameOver: 'GameOver'
+  GameOver: 'GameOver',
+  Distracted: 'Distracted'
 }
 
 const frog = new Frog()
@@ -440,7 +441,7 @@ function drawScreenOverlay(ctx,title,body = "",titleX = 0.5,titleY = 0.45, bodyX
 {
   showResume.value = (currentGameState == GameState.Pause)
   showRetry.value = (currentGameState == GameState.GameOver)
-  showRewardContinue.value = (currentGameState == GameState.Reward)
+  showRewardContinue.value = (currentGameState == GameState.Reward || currentGameState == GameState.Distracted)
 
   ctx.textAlign = 'center'
 
@@ -642,8 +643,10 @@ function render()
     drawScreenOverlay(ctx,'Game Paused')
   else if (currentGameState == GameState.Reward)
     drawRewardScreen(ctx)
-  
-  requestAnimationFrame(render)
+  else if( currentGameState == GameState.Distracted)
+    drawScreenOverlay(ctx, 'Distracted!', 'You got distracted by a bee! Try again',0.5,0.2,0.5,0.27)
+ 
+    requestAnimationFrame(render)
  
 }
 
@@ -717,7 +720,11 @@ onMounted(() =>
         { 
           streak = 0
           if(pad == beepad)
-        {alert("You got distracted by a bee! Try again.")}
+          {
+            currentGameState=GameState.Distracted
+
+          }
+          else
           frog.lives -= 1
           streak = 0
           if (frog.lives <= 0)

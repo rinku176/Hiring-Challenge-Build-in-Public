@@ -219,7 +219,7 @@ function drawAnimatedPlants(ctx)
   }
   
   // Draw small ground plants
-  for (let i = 0; i < 25; i++) 
+  for (let i = 0; i < 32; i++) 
   {
     const x = (i * 40) + 15
     const plantHeight = 25 + Math.sin(time * 0.4 + i) * 5

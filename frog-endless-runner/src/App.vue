@@ -1,12 +1,12 @@
 <template>
-
-      <canvas ref="gameCanvas" v-bind:width="screenWidth * 0.8" v-bind:height="screenHeight * 0.8" class="canvas-class" style="border: 2px solid green;"></canvas>
-      <button v-if="showRetry" class="retry-btn" @click="resetGame">Retry</button>
-      <button v-if="!showResume" class="pause-btn" @click="pauseGame">Pause</button>
-      <button v-if="showResume" class="resume-btn" @click="resumeGame">Resume</button>
-      <button v-if="showRewardContinue" class="continue-btn" @click="resumeGame">Continue</button>
-
- 
+  <canvas ref="gameCanvas" v-bind:width="screenWidth * 0.8" v-bind:height="screenHeight * 0.8" class="canvas-class" style="border: 2px solid green;"></canvas>
+  <button v-if="showRetry" class="retry-btn" @click="resetGame">Retry</button>
+  <button v-if="!showResume && !showLevelSelect" class="pause-btn" @click="pauseGame">Pause</button>
+  <button v-if="showResume" class="resume-btn" @click="resumeGame">Resume</button>
+  <button v-if="showRewardContinue" class="continue-btn" @click="resumeGame">Continue</button>
+  <button v-if="showLevelSelect" class="level-select-btn" id= "level1button" @click="startLevel1">Level1</button>
+  <button v-if="showLevelSelect" class="level-select-btn" id= "level2button"@click="startLevel2">Level2</button>
+  <button v-if="showLevelSelect" class="level-select-btn" id= "level3button" @click="startLevel3">Level3</button>
 </template>
 
 <style scoped>
@@ -15,6 +15,33 @@
   position: absolute;
   top: 2rem;
   left: 2rem;
+}
+
+.level-select-btn
+{
+  position: absolute;
+  font-size: 1rem;
+  height: 3rem;
+  width: 7rem;
+  transform: translate(-50%, -50%);
+  background-color: #f39c12;
+  color: white;
+  border-radius: 8px;
+}
+
+#level1button{
+  top: 50%;
+  left: 30%;
+}
+
+#level2button{
+  top: 50%;
+  left: 45%;
+}
+
+#level3button{
+  top: 50%;
+  left: 60%;
 }
 
 .pause-btn, .resume-btn
@@ -58,8 +85,8 @@
   height: 3rem;
   width: 7rem;
   top: calc(70% - 4rem);
-left: calc(50% - 4rem);
-transform: translate(-50%, -50%);
+  left: calc(50% - 4rem);
+  transform: translate(-50%, -50%);
   background-color: #3498db;
   color: white;
   border-radius: 8px;
@@ -73,6 +100,13 @@ transform: translate(-50%, -50%);
 
 <script setup>
 import { h, onMounted, ref } from 'vue'
+
+const RuleSet = {
+  None: 'None',
+  Level1: 'Level1',  // Level 1: The Basic Level with Hints
+  Level2: 'Level2',  // Level 2: The Level with Arbitrary Numbers
+  Level3: 'Level3'   // Level 3: The Reverse-skip number Level
+}
 
 class Frog
 {
@@ -110,6 +144,7 @@ class Lilypad
 }
 
 const GameState = {
+  LevelSelect: 'LevelSelect',
   GameNotStarted: 'GameNotStarted',
   Playing: 'Playing',
   Pause: 'Pause',
@@ -125,13 +160,14 @@ const gameCanvas = ref(null)
 const showRetry = ref(false)
 const showResume = ref(false)
 const showRewardContinue = ref(false)
+const showLevelSelect = ref(true)
 
 const gravity = 0.5
 let screenWidth = document.documentElement.clientWidth
 let screenHeight = document.documentElement.clientHeight
 
-let currentGameState = GameState.GameNotStarted
-
+let currentGameState = GameState.LevelSelect
+let nowRuleSet = RuleSet.Level1
 let lilypads = new Array()
 let nextcolumn = 0 
 let currentNumber = 2
@@ -147,9 +183,34 @@ let streak = 0
 
 let rewardAnimationFrame = 0
 
+function startGame()
+{
+  showLevelSelect.value = false
+  currentGameState = GameState.GameNotStarted
+  generateLilypads()
+}
+
+function startLevel1()
+{
+  nowRuleSet = RuleSet.Level1
+  startGame()
+}
+
+function startLevel2()
+{  
+  nowRuleSet = RuleSet.Level2
+  startGame()
+
+}
+
+function startLevel3()
+{ 
+  nowRuleSet = RuleSet.Level3
+  startGame()
+}
+
 function drawPretty(canvas,ctx)
 {
-
   // Draw water background with gradient
   const waterGradient = ctx.createLinearGradient(0, 0, 0, canvas.height)
   waterGradient.addColorStop(0, '#87CEEB')
@@ -439,6 +500,7 @@ function drawHeart(ctx, x, y, size, filled) {
   // titleX, titleY,bodyX and bodyYare relative positions to the screen
 function drawScreenOverlay(ctx,title,body = "",titleX = 0.5,titleY = 0.45, bodyX =0.5,bodyY= 0.27)
 {
+  showLevelSelect.value = (currentGameState == GameState.LevelSelect)
   showResume.value = (currentGameState == GameState.Pause)
   showRetry.value = (currentGameState == GameState.GameOver)
   showRewardContinue.value = (currentGameState == GameState.Reward || currentGameState == GameState.Distracted)
@@ -570,7 +632,7 @@ function resumeGame()
 function resetGame() 
 {
   frog.lives = 3
-  currentGameState = GameState.GameNotStarted
+  currentGameState = GameState.LevelSelect
   currentNumber = 2
   frog.x= 100
   frog.y = 300
@@ -586,7 +648,7 @@ function resetGame()
   fly.y = 200
   updateJumpArc()
   LilypadMovementSpeed = 0.8
-  generateLilypads()
+
 }
 
 function updateJumpArc()
@@ -623,6 +685,7 @@ function render()
   screenWidth = document.documentElement.clientWidth
   screenHeight = document.documentElement.clientHeight
 
+  
   const canvas = gameCanvas.value
   const ctx = canvas.getContext('2d')
 
@@ -637,7 +700,9 @@ function render()
   
   if(beepad)
     drawDistraction(ctx)
-  if (currentGameState == GameState.GameOver) 
+  if( currentGameState == GameState.LevelSelect)
+    drawScreenOverlay(ctx, 'Select Level', 'Click to start the game', 0.5, 0.2, 0.5, 0.27)
+  else if (currentGameState == GameState.GameOver) 
     drawScreenOverlay(ctx, 'Game Over')
   else if (  currentGameState == GameState.Pause)
     drawScreenOverlay(ctx,'Game Paused')
@@ -646,7 +711,7 @@ function render()
   else if( currentGameState == GameState.Distracted)
     drawScreenOverlay(ctx, 'Distracted!', 'You got distracted by a bee! Try again',0.5,0.2,0.5,0.27)
  
-    requestAnimationFrame(render)
+  requestAnimationFrame(render)
  
 }
 
@@ -666,7 +731,6 @@ onMounted(() =>
 {
   const canvas = gameCanvas.value
   
-  generateLilypads()
  
   render()
   gameUpdate()

@@ -327,7 +327,6 @@ function drawLilypads(ctx)
 
       if(hintLilypad>0 && pad.isCorrect && nowRuleSet==RuleSet.Level1)
       {
-       
         console.log("hint lilypad",hintLilypad)
         ctx.fillStyle = 'yellow'
         ctx.lineWidth = 2
@@ -335,7 +334,9 @@ function drawLilypads(ctx)
         ctx.ellipse(pad.x, pad.y, drawleafRadiusY * 1.3, drawleafRadiusY*1.1, 0, 0, Math.PI * 2)
         ctx.stroke()
         
-        
+        //The hint text
+        ctx.font = '1rem Arial'
+        ctx.fillText(`Count by 2s are: 2,4,6,8...`, 0.5* ctx.canvas.clientWidth,  0.14* ctx.canvas.clientHeight)
       }
 
       ctx.fillStyle = 'white'

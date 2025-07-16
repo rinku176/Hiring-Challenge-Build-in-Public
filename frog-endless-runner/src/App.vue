@@ -388,7 +388,6 @@ function updateFrogPosition()
   //to make the frog jump before it runs out of the screen
   if ( frog.x < 0)
     forcedFrogJump()
-
 }
 
 function drawRewardFrog(ctx) 
@@ -495,11 +494,11 @@ function drawHUD(ctx)
       drawHeart(ctx, heartX, heartY, heartSize, false)
     }
   }
-  
 
 }
 
-function drawHeart(ctx, x, y, size, filled) {
+function drawHeart(ctx, x, y, size, filled) 
+{
   ctx.save()
   ctx.translate(x, y)
   
@@ -518,7 +517,20 @@ function drawHeart(ctx, x, y, size, filled) {
   ctx.restore()
 }
 
-  // titleX, titleY,bodyX and bodyYare relative positions to the screen
+function drawTask(ctx)
+{
+  ctx.fillStyle = 'white'
+  ctx.font = '1rem Arial'
+  ctx.textAlign = 'center'
+  
+  if(nowRuleSet == RuleSet.Level3)
+    ctx.fillText(`Task: Skip by ${skipStep}s`, 0.5* ctx.canvas.clientWidth,  0.08* ctx.canvas.clientHeight)
+  else 
+    ctx.fillText(`Task: Count by ${skipStep}s`, 0.5* ctx.canvas.clientWidth,  0.08* ctx.canvas.clientHeight)
+  
+}
+
+// titleX, titleY,bodyX and bodyYare relative positions to the screen
 function drawScreenOverlay(ctx,title,body = "",titleX = 0.5,titleY = 0.45, bodyX =0.5,bodyY= 0.27)
 {
   showLevelSelect.value = (currentGameState == GameState.LevelSelect)
@@ -726,6 +738,8 @@ function render()
   drawLilypads(ctx)
   drawFrog(ctx)
   drawHUD(ctx)
+  drawTask(ctx )
+
   
   if(beepad)
     drawDistraction(ctx)

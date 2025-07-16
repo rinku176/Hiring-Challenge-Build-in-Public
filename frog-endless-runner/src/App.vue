@@ -24,7 +24,7 @@
   height: 3rem;
   width: 7rem;
   transform: translate(-50%, -50%);
-  background-color: #f39c12;
+  background-color: #5d12f3;
   color: white;
   border-radius: 8px;
 }
@@ -50,13 +50,13 @@
   top: 3rem; 
   left: 3rem;
   font-size: 1rem;
-  background-color: #ab2a93;
+  background-color: #732aab;
   color: white;
 }
 
 .pause-btn:hover , .resume-btn:hover
 {
-  background-color: #902085;
+  background-color: rgb(105, 32, 144);
 }
 
 .retry-btn 
@@ -312,35 +312,88 @@ function drawAnimatedPlants(ctx)
 
 function drawLilypads(ctx) 
 {
-  ctx.font = '20px Arial'
   let drawleafRadiusY = 0.07482 * ctx.canvas.clientHeight
+  let drawleafRadiusX = drawleafRadiusY * 1.25
+  
   lilypads.forEach(set => 
   {
     set.forEach(pad =>
     {
       ctx.save()
 
-      ctx.fillStyle = '#339966'
+      // Create gradient for lilypad
+      const gradient = ctx.createRadialGradient(pad.x - 15, pad.y - 10, 0, pad.x, pad.y, drawleafRadiusX)
+      gradient.addColorStop(0, '#90EE90')
+      //gradient.addColorStop(0.4, '#32CD32')
+      //gradient.addColorStop(0.8, '#228B22')
+      gradient.addColorStop(1, '#006400')
+
+      // Draw main lilypad
+      ctx.fillStyle = gradient
       ctx.beginPath()
-      ctx.ellipse(pad.x, pad.y, drawleafRadiusY * 1.25, drawleafRadiusY, 0, 0, Math.PI * 2)
+      ctx.ellipse(pad.x, pad.y, drawleafRadiusX, drawleafRadiusY, 0, 0, Math.PI * 2)
       ctx.fill()
 
-      if(hintLilypad>0 && pad.isCorrect && nowRuleSet==RuleSet.Level1)
+      // Draw lilypad outline
+      ctx.strokeStyle = '#006400'
+      ctx.lineWidth = 2
+      ctx.stroke()
+
+
+      // Draw veins on the lilypad
+      ctx.strokeStyle = '#228B22'
+      ctx.lineWidth = 1
+      ctx.setLineDash([3, 3])
+      
+      // Central vein
+      ctx.beginPath()
+      ctx.moveTo(pad.x - drawleafRadiusX * 0.6, pad.y)
+      ctx.lineTo(pad.x + drawleafRadiusX * 0.6, pad.y)
+      ctx.stroke()
+    
+      
+      ctx.setLineDash([]) // Reset line dash
+
+      // Highlight effect for hint lilypads
+      if(hintLilypad > 0 && pad.isCorrect && nowRuleSet == RuleSet.Level1)
       {
-        console.log("hint lilypad",hintLilypad)
-        ctx.fillStyle = 'yellow'
-        ctx.lineWidth = 2
+        console.log("hint lilypad", hintLilypad)
+        
+        // Animated glow effect
+        const glowIntensity = 0.5 + 0.5 * Math.sin(Date.now() * 0.005)
+        ctx.strokeStyle = `rgba(255, 255, 0, ${glowIntensity})`
+        ctx.lineWidth = 4
         ctx.beginPath()
-        ctx.ellipse(pad.x, pad.y, drawleafRadiusY * 1.3, drawleafRadiusY*1.1, 0, 0, Math.PI * 2)
+        ctx.ellipse(pad.x, pad.y, drawleafRadiusX * 1.1, drawleafRadiusY * 1.1, 0, 0, Math.PI * 2)
         ctx.stroke()
 
-        //The hint text
-        ctx.font = '1rem Arial'
-        ctx.fillText(`Count by 2s are: 2,4,6,8...`, 0.5* ctx.canvas.clientWidth,  0.14* ctx.canvas.clientHeight)
+        // Hint text
+        ctx.fillStyle = '#FFFF00'
+        ctx.font = ' 1rem Arial'
+        ctx.textAlign = 'center'
+        ctx.fillText(`Count by 2s are: 2, 4, 6, 8...`, 0.5 * ctx.canvas.clientWidth, 0.16 * ctx.canvas.clientHeight)
       }
 
-      ctx.fillStyle = 'white'
-      ctx.fillText(pad.number, pad.x - 10, pad.y + 5)
+      // Draw number with enhanced styling
+      const fontSize = Math.max(18, drawleafRadiusY * 0.4)
+      
+      // Number background circle
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.95)'
+      ctx.beginPath()
+      ctx.arc(pad.x, pad.y, drawleafRadiusY * 0.45, 0, Math.PI * 2)
+      ctx.fill()
+      
+      ctx.strokeStyle = '#006400'
+      ctx.lineWidth = 2
+      ctx.stroke()
+
+      // Draw the number
+      ctx.fillStyle = '#006400'
+      ctx.font = `bold ${fontSize}px Arial`
+      ctx.textAlign = 'center'
+      ctx.textBaseline = 'middle'
+      ctx.fillText(pad.number, pad.x, pad.y)
+
 
       ctx.restore()
     })
@@ -367,14 +420,87 @@ function updateLilypadPosition()
 
 function drawFrog(ctx) 
 { 
+  const frogRadius = 0.06 * ctx.canvas.clientHeight
+  
+  // Draw shadow for depth
+  ctx.save()
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.3)'
   ctx.beginPath()
-  ctx.arc(frog.x, frog.y, 0.06 * ctx.canvas.clientHeight, 0, Math.PI * 2)
-  ctx.fillStyle = 'green'
+  ctx.ellipse(frog.x + 3, frog.y + 8, frogRadius * 0.8, frogRadius * 0.4, 0, 0, Math.PI * 2)
   ctx.fill()
-
-  ctx.fillStyle = 'white'
-  ctx.font = '16px Arial'
-  ctx.fillText(currentNumber, frog.x - 15, frog.y + 5)
+  ctx.restore()
+  
+  // Draw main frog body with gradient
+  const gradient = ctx.createRadialGradient(frog.x - 10, frog.y - 10, 0, frog.x, frog.y, frogRadius)
+  gradient.addColorStop(0, '#90EE90')
+  gradient.addColorStop(1, '#228B22')
+  
+  ctx.fillStyle = gradient
+  ctx.beginPath()
+  ctx.arc(frog.x, frog.y, frogRadius, 0, Math.PI * 2)
+  ctx.fill()
+  
+  // Draw frog outline
+  ctx.strokeStyle = '#006400'
+  ctx.lineWidth = 2
+  ctx.stroke()
+  
+  // Draw eyes
+  const eyeRadius = frogRadius * 0.25
+  const eyeOffset = frogRadius * 0.4
+  
+  // Left eye
+  ctx.fillStyle = '#FFFFFF'
+  ctx.beginPath()
+  ctx.arc(frog.x - eyeOffset, frog.y - eyeOffset, eyeRadius, 0, Math.PI * 2)
+  ctx.fill()
+  ctx.strokeStyle = '#000000'
+  ctx.lineWidth = 1
+  ctx.stroke()
+  
+  // Right eye
+  ctx.beginPath()
+  ctx.arc(frog.x + eyeOffset, frog.y - eyeOffset, eyeRadius, 0, Math.PI * 2)
+  ctx.fill()
+  ctx.stroke()
+  
+  // Draw pupils
+  ctx.fillStyle = '#000000'
+  ctx.beginPath()
+  ctx.arc(frog.x - eyeOffset, frog.y - eyeOffset, eyeRadius * 0.5, 0, Math.PI * 2)
+  ctx.fill()
+  ctx.beginPath()
+  ctx.arc(frog.x + eyeOffset, frog.y - eyeOffset, eyeRadius * 0.5, 0, Math.PI * 2)
+  ctx.fill()
+  
+  // Draw mouth
+  ctx.strokeStyle = '#006400'
+  ctx.lineWidth = 2
+  ctx.beginPath()
+  ctx.arc(frog.x, frog.y + eyeOffset * 0.5, frogRadius * 0.6, 0, Math.PI)
+  ctx.stroke()
+  
+  // Draw number on frog's belly with background
+  ctx.save()
+  
+  // Number background circle
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.9)'
+  ctx.beginPath()
+  ctx.arc(frog.x, frog.y + 5, frogRadius * 0.6, 0, Math.PI * 2)
+  ctx.fill()
+  
+  ctx.strokeStyle = '#228B22'
+  ctx.lineWidth = 2
+  ctx.stroke()
+  
+  // Draw the number
+  ctx.fillStyle = '#006400'
+  ctx.font = `bold ${Math.max(16, frogRadius * 0.6)}px Arial`
+  ctx.textAlign = 'center'
+  ctx.textBaseline = 'middle'
+  ctx.fillText(currentNumber, frog.x, frog.y + 5)
+  
+  ctx.restore()
 }
 
 function updateFrogPosition()
@@ -439,11 +565,13 @@ function drawDistraction(ctx)
 
 function jumpTo(pad)
 {
- 
-
   if(pad.isCorrect)
     frog.stickpad = pad
-
+//   else
+// {
+//   frog.stickpad = pad
+//   frog.stickpad = currentNumber
+// }
   if (frog.jumping) 
     return
 

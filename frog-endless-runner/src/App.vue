@@ -194,6 +194,7 @@ function startLevel1()
 {
   nowRuleSet = RuleSet.Level1
   skipStep = 2
+  
   startGame()
 }
 
@@ -208,6 +209,8 @@ function startLevel2()
 function startLevel3()
 { 
   nowRuleSet = RuleSet.Level3
+  skipStep =3
+  currentNumber = 3
   startGame()
 }
 
@@ -525,8 +528,8 @@ function drawScreenOverlay(ctx,title,body = "",titleX = 0.5,titleY = 0.45, bodyX
 
 function generateLilypads() 
 {
-    const canvas = gameCanvas.value
-
+  const canvas = gameCanvas.value
+  
   if(currentGameState == GameState.GameNotStarted)
   {
     const correctNumber = currentNumber + skipStep
@@ -547,6 +550,10 @@ function generateLilypads()
     {
       let y = canvas.clientHeight * 0.66 * ((i +1) / 3.0)
       lilypadColumn.push(new Lilypad(x, y, allNumbers[i], allNumbers[i] == correctNumber))
+      if(nowRuleSet == RuleSet.Level3)
+      {
+        lilypadColumn[i].isCorrect = (allNumbers[i] !=correctNumber)
+      }
     }
 
     lilypads.push(lilypadColumn)
@@ -573,6 +580,10 @@ function generateLilypads()
     {
       let y = canvas.clientHeight * 0.66 * ((i +1)/ 3.0)
       lilypadColumn.push(new Lilypad(x, y, allNumbers[i], allNumbers[i] == correctNumber))
+      if(nowRuleSet == RuleSet.Level3)
+      {
+        lilypadColumn[i].isCorrect = (allNumbers[i] !=correctNumber)
+      }
     }
     lilypads.push(lilypadColumn)
   }

@@ -178,6 +178,7 @@ let beepad = null
 let lilypadTimer = null
 let AttachBeepadTimer = null
 let streak = 0
+let hintLilypad = 0
 
 // Reward animation variables
 
@@ -324,6 +325,19 @@ function drawLilypads(ctx)
       ctx.ellipse(pad.x, pad.y, drawleafRadiusY * 1.25, drawleafRadiusY, 0, 0, Math.PI * 2)
       ctx.fill()
 
+      if(hintLilypad>0 && pad.isCorrect && nowRuleSet==RuleSet.Level1)
+      {
+       
+        console.log("hint lilypad",hintLilypad)
+        ctx.fillStyle = 'yellow'
+        ctx.lineWidth = 2
+        ctx.beginPath()
+        ctx.ellipse(pad.x, pad.y, drawleafRadiusY * 1.3, drawleafRadiusY*1.1, 0, 0, Math.PI * 2)
+        ctx.stroke()
+        
+        
+      }
+
       ctx.fillStyle = 'white'
       ctx.fillText(pad.number, pad.x - 10, pad.y + 5)
 
@@ -440,6 +454,7 @@ function jumpTo(pad)
 
 function forcedFrogJump()
 {
+  hintLilypad = 3
   for (let pad of lilypads[nextcolumn])
   {
     if (pad.isCorrect) 
@@ -459,6 +474,7 @@ function forcedFrogJump()
     }
   }
 }
+
 function drawHUD(ctx) 
 {
   // Draw hearts for lives 
@@ -771,6 +787,10 @@ onMounted(() =>
         if (pad.isCorrect) 
         {
           streak++
+
+          if(hintLilypad > 0)
+            hintLilypad--
+          
           
           if (streak% 2 ==0 && streak > 0) {
             currentGameState = GameState.Reward

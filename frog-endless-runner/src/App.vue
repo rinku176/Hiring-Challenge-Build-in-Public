@@ -333,7 +333,7 @@ function drawLilypads(ctx)
         ctx.beginPath()
         ctx.ellipse(pad.x, pad.y, drawleafRadiusY * 1.3, drawleafRadiusY*1.1, 0, 0, Math.PI * 2)
         ctx.stroke()
-        
+
         //The hint text
         ctx.font = '1rem Arial'
         ctx.fillText(`Count by 2s are: 2,4,6,8...`, 0.5* ctx.canvas.clientWidth,  0.14* ctx.canvas.clientHeight)
@@ -439,6 +439,8 @@ function drawDistraction(ctx)
 
 function jumpTo(pad)
 {
+ 
+
   if(pad.isCorrect)
     frog.stickpad = pad
 
@@ -676,8 +678,8 @@ function resetGame()
   frog.lives = 3
   currentGameState = GameState.LevelSelect
   currentNumber = 2
-  frog.x= 100
-  frog.y = 300
+  frog.x = 0.1 * document.documentElement.clientWidth
+  frog.y = 0.4 * document.documentElement.clientHeight
   lilypads = new Array()
   nextcolumn = 0
   frog.stickpad = null
@@ -838,6 +840,7 @@ onMounted(() =>
           }
           else
           frog.lives -= 1
+
           streak = 0
           if (frog.lives <= 0)
           {

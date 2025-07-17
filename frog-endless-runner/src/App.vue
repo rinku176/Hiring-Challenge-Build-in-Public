@@ -518,8 +518,6 @@ function drawLilypads(ctx)
         ctx.fillText(`Count by 2s are: 2, 4, 6, 8...`, 0.5 * ctx.canvas.clientWidth, 0.16 * ctx.canvas.clientHeight)
       }
 
-      // Draw number with enhanced styling
-      const fontSize = Math.max(18, drawleafRadiusY * 0.4)
       
       // Number background circle
       ctx.fillStyle = 'rgba(255, 255, 255, 0.95)'
@@ -533,7 +531,7 @@ function drawLilypads(ctx)
 
       // Draw the number
       ctx.fillStyle = '#006400'
-      ctx.font = `bold ${fontSize}px Arial`
+      ctx.font = `bold 1rem Arial`
       ctx.textAlign = 'center'
       ctx.textBaseline = 'middle'
       ctx.fillText(pad.number, pad.x, pad.y)
@@ -639,7 +637,7 @@ function drawFrog(ctx)
   
   // Draw the number
   ctx.fillStyle = '#006400'
-  ctx.font = `bold ${Math.max(16, frogRadius * 0.6)}px Arial`
+  ctx.font = `bold 1rem Arial`
   ctx.textAlign = 'center'
   ctx.textBaseline = 'middle'
   ctx.fillText(currentNumber, frog.x, frog.y + 5)

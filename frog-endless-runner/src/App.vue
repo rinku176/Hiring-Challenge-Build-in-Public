@@ -816,7 +816,7 @@ function resetGame()
   fly.y = 200
   updateJumpArc()
   LilypadMovementSpeed = 0.8
-
+  hintlilypad = 0
 }
 
 function updateJumpArc()

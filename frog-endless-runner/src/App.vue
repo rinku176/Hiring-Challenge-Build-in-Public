@@ -119,6 +119,7 @@ class Frog
     this.velocityX = 0
     this.velocityY = 0
     this.lives = 3
+    this.jumpTarget = null
   }
 }
 
@@ -565,21 +566,16 @@ function drawDistraction(ctx)
 
 function jumpTo(pad)
 {
-  if(pad.isCorrect)
-    frog.stickpad = pad
-//   else
-// {
-//   frog.stickpad = pad
-//   frog.stickpad = currentNumber
-// }
+
   if (frog.jumping) 
     return
 
+    frog.jumpTarget = pad
   frog.jumping = true
 
   const frames = 20
-  frog.velocityX = (frog.stickpad.x - frog.x) / frames
-  frog.velocityY = (frog.stickpad.y - frog.y - 50) / frames // slight arc
+  frog.velocityX = (pad.x - frog.x) / frames
+  frog.velocityY = (pad.y - frog.y - 50) / frames // slight arc
 }
 
 function forcedFrogJump()
@@ -827,20 +823,47 @@ function updateJumpArc()
 {
   if (frog.jumping) 
   {
+
     frog.x += frog.velocityX
     frog.y += frog.velocityY
+
     frog.velocityY += gravity
 
     // Stop when near target
-    const dx = Math.abs(frog.x - frog.stickpad.x)
-    const dy = Math.abs(frog.y - frog.stickpad.y)
-    if (dx < 50 && dy < 50) 
+    const dx = Math.abs(frog.x - frog.jumpTarget.x)
+    const dy = Math.abs(frog.y - frog.jumpTarget.y)
+    if (dx < 50 && dy < 50 && frog.jumpTarget.isCorrect) 
     {
       frog.x = frog.stickpad.x
       frog.y = frog.stickpad.y
       frog.velocityX = 0
       frog.velocityY = 0
       frog.jumping = false
+    }
+    else if (dx< 50 && dy < 50 && !frog.jumpTarget.isCorrect && frog.stickpad != null) 
+    {
+      const frames = 20
+      frog.jumpTarget = frog.stickpad
+      frog.velocityX = (frog.stickpad.x - frog.x) / frames
+      frog.velocityY = (frog.stickpad.y - frog.y - 50) / frames // slight arc
+    }
+    else if(dx< 50 && dy < 50 && !frog.jumpTarget.isCorrect && frog.jumpTarget.number!=-1)
+    {
+      const frames = 20
+      let dummyLilypad = new Lilypad(0.1 * document.documentElement.clientWidth, 0.4 * document.documentElement.clientHeight, -1, false)
+      frog.jumpTarget = dummyLilypad
+      frog.velocityX = (dummyLilypad.x- frog.x) / frames
+      frog.velocityY = (dummyLilypad.y - frog.y - 50) /frames// slight arc
+    }
+    else if(dx <50&& dy < 50 && frog.jumpTarget.number == -1 )
+    {
+      frog.x = frog.jumpTarget.x
+      frog.y = frog.jumpTarget.y
+      frog.jumping = false
+      frog.jumpTarget = null
+      frog.velocityX = 0
+      frog.velocityY = 0
+      
     }
   }
 }

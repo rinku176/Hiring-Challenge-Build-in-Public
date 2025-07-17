@@ -564,8 +564,9 @@ function drawFrog(ctx)
 { 
   const frogRadius = 0.06 * ctx.canvas.clientHeight
   
-  // Draw shadow for depth
   ctx.save()
+
+  // Draw shadow for depth
   ctx.fillStyle = 'rgba(0, 0, 0, 0.3)'
   ctx.beginPath()
   ctx.ellipse(frog.x + 3, frog.y + 8, frogRadius * 0.8, frogRadius * 0.4, 0, 0, Math.PI * 2)
@@ -615,16 +616,11 @@ function drawFrog(ctx)
   ctx.arc(frog.x + eyeOffset, frog.y - eyeOffset, eyeRadius * 0.5, 0, Math.PI * 2)
   ctx.fill()
   
-  // Draw mouth
-  ctx.strokeStyle = '#006400'
-  ctx.lineWidth = 2
-  ctx.beginPath()
-  ctx.arc(frog.x, frog.y + eyeOffset * 0.5, frogRadius * 0.6, 0, Math.PI)
-  ctx.stroke()
   
   // Draw number on frog's belly with background
   ctx.save()
-  
+   if(currentGameState != GameState.Reward)
+  {
   // Number background circle
   ctx.fillStyle = 'rgba(255, 255, 255, 0.9)'
   ctx.beginPath()
@@ -634,13 +630,15 @@ function drawFrog(ctx)
   ctx.strokeStyle = '#228B22'
   ctx.lineWidth = 2
   ctx.stroke()
-  
+
+ 
   // Draw the number
   ctx.fillStyle = '#006400'
   ctx.font = `bold 1rem Arial`
   ctx.textAlign = 'center'
   ctx.textBaseline = 'middle'
   ctx.fillText(currentNumber, frog.x, frog.y + 5)
+  }
   
   ctx.restore()
 }
@@ -662,20 +660,10 @@ function updateFrogPosition()
 function drawRewardFrog(ctx) 
 {
   // Draw frog in center
-  const centerX = 0.5 * ctx.canvas.clientWidth
-  const centerY = 0.48 * ctx.canvas.clientHeight
+  frog.x = 0.5 * ctx.canvas.clientWidth
+  frog.y = 0.48 * ctx.canvas.clientHeight
   
-  ctx.beginPath()
-  ctx.arc(centerX, centerY, 0.05 * ctx.canvas.clientHeight, 0, Math.PI * 2)
-  ctx.fillStyle = 'green'
-  ctx.fill()
-
-  // Draw eyes
-  ctx.beginPath()
-  ctx.arc(centerX - (0.02056 *ctx.canvas.clientHeight), centerY - (0.02056 *ctx.canvas.clientHeight), 0.0068 *ctx.canvas.clientHeight, 0, Math.PI * 2)
-  ctx.arc(centerX + (0.02056 *ctx.canvas.clientHeight), centerY - (0.02056 *ctx.canvas.clientHeight), 0.0068 *ctx.canvas.clientHeight, 0, Math.PI * 2)
-  ctx.fillStyle = 'white'
-  ctx.fill()
+  drawFrog(ctx)
 
   // Draw tongue if extended
   if (fly.tongueExtended) 
@@ -683,10 +671,25 @@ function drawRewardFrog(ctx)
     ctx.strokeStyle = 'red'
     ctx.lineWidth = 4
     ctx.beginPath()
-    ctx.moveTo(centerX, centerY)
+    ctx.moveTo(frog.x, frog.y)
     ctx.lineTo(fly.x, fly.y)
     ctx.stroke()
   }
+}
+
+function bestowReward()
+{
+  streak++
+  if(hintLilypad > 0)
+    hintLilypad--
+  
+  
+  if (streak% 2 ==0 && streak > 0) 
+  {
+    currentGameState = GameState.Reward
+    LilypadMovementSpeed += 0.2
+    streak = 0 // Reset streak after reward
+  } 
 }
 
 function drawFly(ctx) 
@@ -977,6 +980,7 @@ function updateJumpArc()
     
     if (dx < 50 && dy < 50 && frog.jumpTarget.isCorrect) 
     {
+      bestowReward()
       frog.x = frog.stickpad.x
       frog.y = frog.stickpad.y
       frog.velocityX = 0
@@ -1033,7 +1037,8 @@ function render()
   drawPretty(canvas,ctx)
   drawAnimatedPlants(ctx)
   drawLilypads(ctx)
-  drawFrog(ctx)
+  if(currentGameState != GameState.Reward)
+    drawFrog(ctx)
   drawCrocodile(ctx)
   drawHUD(ctx)
   drawTask(ctx )
@@ -1099,17 +1104,7 @@ onMounted(() =>
 
         if (pad.isCorrect) 
         {
-          streak++
-
-          if(hintLilypad > 0)
-            hintLilypad--
           
-          
-          if (streak% 2 ==0 && streak > 0) {
-            currentGameState = GameState.Reward
-            LilypadMovementSpeed += 0.2
-            streak = 0 // Reset streak after reward
-          } 
     
           if(currentGameState == GameState.GameNotStarted)
           {

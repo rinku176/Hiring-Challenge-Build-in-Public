@@ -728,7 +728,7 @@ function forcedFrogJump()
   {
     if (pad.isCorrect) 
     {
-      
+      frog.stickpad = pad
       jumpTo(pad)
       nextcolumn++
       currentNumber += skipStep
@@ -976,6 +976,7 @@ function updateJumpArc()
     // Stop when near target
     const dx = Math.abs(frog.x - frog.jumpTarget.x)
     const dy = Math.abs(frog.y - frog.jumpTarget.y)
+    
     if (dx < 50 && dy < 50 && frog.jumpTarget.isCorrect) 
     {
       frog.x = frog.stickpad.x

@@ -181,6 +181,14 @@ let AttachBeepadTimer = null
 let streak = 0
 let hintLilypad = 0
 
+let crocodile = {
+  x: 0,
+  y: 0,
+  visible: false,
+  timer: 0,
+  animationFrame: 0
+}
+
 // Reward animation variables
 
 let rewardAnimationFrame = 0
@@ -311,6 +319,141 @@ function drawAnimatedPlants(ctx)
 
 }
 
+
+function showCrocodile() 
+{
+  const canvas = gameCanvas.value
+  crocodile.x = canvas.clientWidth  
+  crocodile.y = canvas.clientHeight -20 
+  crocodile.visible = true
+  crocodile.timer = 480 
+  crocodile.animationFrame = 0
+}
+
+function updateCrocodile() 
+{
+  if (crocodile.visible) {
+    crocodile.timer--
+    crocodile.animationFrame++
+    
+    if (crocodile.timer <= 0) {
+      crocodile.visible = false
+    }
+  }
+}
+
+function drawCrocodile(ctx) 
+{
+  if (!crocodile.visible) return
+  
+  const canvas = ctx.canvas
+  const canvasWidth = canvas.clientWidth
+  const canvasHeight = canvas.clientHeight
+  
+  const crocodileWidth = canvasWidth * 0.8 
+  const crocodileHeight = canvasHeight * 0.15 
+  
+ 
+  let yOffset = 0
+  if (crocodile.animationFrame < 20) {
+    yOffset = (20 - crocodile.animationFrame) * 4 
+  } else if (crocodile.timer < 20) {
+    yOffset = (20 - crocodile.timer) * 4 
+  }
+  
+  const drawY = crocodile.y + yOffset
+  const centerX = canvasWidth * 0.5
+  
+  ctx.save()
+  
+  ctx.fillStyle = '#2F4F2F'
+  ctx.beginPath()
+  ctx.ellipse(centerX, drawY, crocodileWidth * 0.4, crocodileHeight * 0.3, 0, 0, Math.PI * 2)
+  ctx.fill()
+  
+  // Draw head (left side)
+  ctx.fillStyle = '#228B22'
+  ctx.beginPath()
+  ctx.ellipse(centerX - crocodileWidth * 0.35, drawY - crocodileHeight * 0.05, crocodileWidth * 0.15, crocodileHeight * 0.25, 0, 0, Math.PI * 2)
+  ctx.fill()
+  
+  // Draw tip
+  ctx.fillStyle = '#32CD32'
+  ctx.beginPath()
+  ctx.ellipse(centerX - crocodileWidth * 0.45, drawY - crocodileHeight * 0.05, crocodileWidth * 0.05, crocodileHeight * 0.12, 0, 0, Math.PI * 2)
+  ctx.fill()
+  
+  // Draw tail (right side)
+  ctx.fillStyle = '#2F4F2F'
+  ctx.beginPath()
+  ctx.ellipse(centerX + crocodileWidth * 0.35, drawY, crocodileWidth * 0.12, crocodileHeight * 0.2, 0, 0, Math.PI * 2)
+  ctx.fill()
+  
+  // Draw back ridges/spikes across the length
+  ctx.fillStyle = '#1C3A1C'
+  const numSpikes = 12
+  for (let i = 0; i < numSpikes; i++) {
+    const spikeX = centerX - crocodileWidth * 0.3 + (i * crocodileWidth * 0.05)
+    const spikeHeight = crocodileHeight * 0.15
+    ctx.beginPath()
+    ctx.moveTo(spikeX, drawY - crocodileHeight * 0.3)
+    ctx.lineTo(spikeX + crocodileWidth * 0.02, drawY - crocodileHeight * 0.3 - spikeHeight)
+    ctx.lineTo(spikeX + crocodileWidth * 0.04, drawY - crocodileHeight * 0.3)
+    ctx.closePath()
+    ctx.fill()
+  }
+  
+  // Draw nostrils
+  ctx.fillStyle = '#000000'
+  ctx.beginPath()
+  ctx.ellipse(centerX - crocodileWidth * 0.42, drawY - crocodileHeight * 0.08, crocodileWidth * 0.008, crocodileHeight * 0.02, 0, 0, Math.PI * 2)
+  ctx.ellipse(centerX - crocodileWidth * 0.4, drawY - crocodileHeight * 0.08, crocodileWidth * 0.008, crocodileHeight * 0.02, 0, 0, Math.PI * 2)
+  ctx.fill()
+  
+  // Draw eyes 
+  ctx.fillStyle = '#228B22'
+  ctx.beginPath()
+  ctx.ellipse(centerX - crocodileWidth * 0.25, drawY - crocodileHeight * 0.2, crocodileWidth * 0.03, crocodileHeight * 0.08, 0, 0, Math.PI * 2)
+  ctx.ellipse(centerX - crocodileWidth * 0.15, drawY - crocodileHeight * 0.2, crocodileWidth * 0.03, crocodileHeight * 0.08, 0, 0, Math.PI * 2)
+  ctx.fill()
+  
+  // Draw eye pupils
+  ctx.fillStyle = '#FFFF00'
+  ctx.beginPath()
+  ctx.ellipse(centerX - crocodileWidth * 0.25, drawY - crocodileHeight * 0.2, crocodileWidth * 0.015, crocodileHeight * 0.06, 0, 0, Math.PI * 2)
+  ctx.ellipse(centerX - crocodileWidth * 0.15, drawY - crocodileHeight * 0.2, crocodileWidth * 0.015, crocodileHeight * 0.06, 0, 0, Math.PI * 2)
+  ctx.fill()
+  
+  // Draw vertical pupils 
+  ctx.fillStyle = '#000000'
+  ctx.fillRect(centerX - crocodileWidth * 0.255, drawY - crocodileHeight * 0.25, crocodileWidth * 0.01, crocodileHeight * 0.1)
+  ctx.fillRect(centerX - crocodileWidth * 0.155, drawY - crocodileHeight * 0.25, crocodileWidth * 0.01, crocodileHeight * 0.1)
+  
+  // Draw mouth line
+  ctx.strokeStyle = '#000000'
+  ctx.lineWidth = 3
+  ctx.beginPath()
+  ctx.moveTo(centerX - crocodileWidth * 0.45, drawY + crocodileHeight * 0.05)
+  ctx.lineTo(centerX - crocodileWidth * 0.1, drawY + crocodileHeight * 0.1)
+  ctx.stroke()
+  
+  // Draw sharp teeth along the mouth
+  ctx.fillStyle = '#FFFFFF'
+  const numTeeth = 16
+  for (let i = 0; i < numTeeth; i++) {
+    const toothX = centerX - crocodileWidth * 0.42 + (i * crocodileWidth * 0.02)
+    const toothHeight = crocodileHeight * 0.08
+    ctx.beginPath()
+    ctx.moveTo(toothX, drawY + crocodileHeight * 0.05)
+    ctx.lineTo(toothX + crocodileWidth * 0.005, drawY + crocodileHeight * 0.05 - toothHeight)
+    ctx.lineTo(toothX + crocodileWidth * 0.01, drawY + crocodileHeight * 0.05)
+    ctx.closePath()
+    ctx.fill()
+  }
+   
+  ctx.restore()
+}
+
 function drawLilypads(ctx) 
 {
   let drawleafRadiusY = 0.07482 * ctx.canvas.clientHeight
@@ -434,7 +577,7 @@ function drawFrog(ctx)
   // Draw main frog body with gradient
   const gradient = ctx.createRadialGradient(frog.x - 10, frog.y - 10, 0, frog.x, frog.y, frogRadius)
   gradient.addColorStop(0, '#90EE90')
-  gradient.addColorStop(1, '#228B22')
+  //gradient.addColorStop(1, '#228B22')
   
   ctx.fillStyle = gradient
   ctx.beginPath()
@@ -590,6 +733,7 @@ function forcedFrogJump()
       nextcolumn++
       currentNumber += skipStep
       frog.lives--
+      showCrocodile() 
       streak = 0
       if(frog.lives<=0)
       {
@@ -891,6 +1035,7 @@ function render()
   drawAnimatedPlants(ctx)
   drawLilypads(ctx)
   drawFrog(ctx)
+  drawCrocodile(ctx)
   drawHUD(ctx)
   drawTask(ctx )
 
@@ -919,6 +1064,7 @@ function gameUpdate()
   //to make the frog jump along with the lilypad or before it runs out of the screen
   updateFrogPosition()
   updateJumpArc()
+  updateCrocodile()
 
   requestAnimationFrame(gameUpdate)
   
@@ -989,9 +1135,9 @@ onMounted(() =>
             currentGameState=GameState.Distracted
 
           }
-          else
+          else{
           frog.lives -= 1
-
+showCrocodile()}
           streak = 0
           if (frog.lives <= 0)
           {

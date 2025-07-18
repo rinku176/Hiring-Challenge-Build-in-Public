@@ -976,7 +976,7 @@ function resetGame()
   updateJumpArc()
   LilypadMovementSpeed = 0.8
   hintLilypad = 0
-LilypadGenerationInterval = 0
+  LilypadGenerationInterval = 2000
 }
 
 function updateJumpArc()

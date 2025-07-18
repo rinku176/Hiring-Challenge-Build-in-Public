@@ -1,5 +1,5 @@
 <template>
-  <canvas ref="gameCanvas" v-bind:width="screenWidth * 0.8" v-bind:height="screenHeight * 0.8" class="canvas-class" style="border: 2px solid green;"></canvas>
+  <canvas ref="gameCanvas" v-bind:width="screenWidth" v-bind:height="screenHeight" class="canvas-class" style="border: 2px solid green;"></canvas>
   <button v-if="showRetry" class="retry-btn" @click="resetGame">Retry</button>
   <button v-if="!showResume && !showLevelSelect" class="pause-btn" @click="pauseGame">Pause</button>
   <button v-if="showResume" class="resume-btn" @click="resumeGame">Resume</button>
@@ -10,11 +10,29 @@
 </template>
 
 <style scoped>
-.canvas-class 
-{
+/* Remove all margins and padding */
+* {
+  margin: 0;
+  padding: 1rem;
+  box-sizing: border-box;
+}
+
+.game-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.canvas-class {
   position: absolute;
-  top: 2rem;
-  left: 2rem;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: block;
 }
 
 .level-select-btn

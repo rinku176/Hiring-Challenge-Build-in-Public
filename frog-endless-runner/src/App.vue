@@ -62,7 +62,7 @@
 .retry-btn 
 {
   position: absolute;
-  font-size: 18px;
+  font-size: 1rem;
   height: 3rem;
   width: 7rem;
   top: calc(70% - 4rem);
@@ -81,7 +81,7 @@
 .continue-btn 
 {
   position: absolute;
-  font-size: 18px;
+  font-size: 1rem;
   height: 3rem;
   width: 7rem;
   top: calc(70% - 4rem);

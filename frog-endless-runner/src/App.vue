@@ -173,13 +173,16 @@ let lilypads = new Array()
 let nextcolumn = 0 
 let currentNumber = 2
 let skipStep = 2
-let LilypadMovementSpeed = 0.8
+let LilypadMovementSpeed = 1
 
 let beepad = null 
 let lilypadTimer = null
 let AttachBeepadTimer = null
 let streak = 0
 let hintLilypad = 0
+
+let LilypadGenerationTimer = 0
+let LilypadGenerationInterval = 2000
 
 let crocodile = {
   x: 0,
@@ -560,6 +563,16 @@ function updateLilypadPosition()
   }
 }
 
+function LilypadGenerationTimerFunction()
+{
+  LilypadGenerationTimer++
+  if(LilypadGenerationTimer>= (LilypadGenerationInterval/ LilypadMovementSpeed))
+  {
+    LilypadGenerationTimer = 0
+    generateLilypads()
+  }
+}
+
 function drawFrog(ctx) 
 { 
   const frogRadius = 0.06 * ctx.canvas.clientHeight
@@ -684,9 +697,10 @@ function bestowReward()
     hintLilypad--
   
   
-  if (streak% 2 ==0 && streak > 0) 
+  if (streak% 10 ==0 && streak > 0) 
   {
     currentGameState = GameState.Reward
+    clearInterval(lilypadTimer)
     LilypadMovementSpeed += 0.2
     streak = 0 // Reset streak after reward
   } 
@@ -717,7 +731,7 @@ function jumpTo(pad)
     frog.jumpTarget = pad
   frog.jumping = true
 
-  const frames = 20
+  const frames = 10
   frog.velocityX = (pad.x - frog.x) / frames
   frog.velocityY = (pad.y - frog.y - 50) / frames // slight arc
 }
@@ -740,6 +754,7 @@ function forcedFrogJump()
       {
         frog.lives = 0
         currentGameState = GameState.GameOver
+        clearInterval(lilypadTimer)
       }
       break;
     }
@@ -822,7 +837,6 @@ function drawScreenOverlay(ctx,title,body = "",titleX = 0.5,titleY = 0.45, bodyX
   ctx.font = '1.2rem Arial'
   ctx.fillText(body, bodyX * ctx.canvas.clientWidth, bodyY * ctx.canvas.clientHeight)
 
-  clearInterval(lilypadTimer)
   clearInterval(AttachBeepadTimer)
 }
 
@@ -922,6 +936,7 @@ function drawRewardScreen(ctx)
 function pauseGame() 
 {
   currentGameState = GameState.Pause
+  clearInterval(lilypadTimer)
 }
 
 function resumeGame() 
@@ -935,8 +950,7 @@ function resumeGame()
   fly.x = 500
   fly.y = 200
 
-  generateLilypads()
-  lilypadTimer = setInterval(generateLilypads, 5500)
+  lilypadTimer = setInterval(LilypadGenerationTimerFunction, 1)
   AttachBeepadTimer = setInterval(AttachBeepad, Math.random() * 10000 + 2000)
   
   
@@ -962,6 +976,7 @@ function resetGame()
   updateJumpArc()
   LilypadMovementSpeed = 0.8
   hintLilypad = 0
+LilypadGenerationInterval = 0
 }
 
 function updateJumpArc()
@@ -1110,7 +1125,7 @@ onMounted(() =>
           {
             currentGameState = GameState.Playing
             generateLilypads()
-            lilypadTimer = setInterval(generateLilypads, 5500)
+            lilypadTimer = setInterval(LilypadGenerationTimerFunction, 1)
             AttachBeepadTimer = setInterval(AttachBeepad, Math.random() * 10000 + 2000)
           }
 
@@ -1131,12 +1146,13 @@ onMounted(() =>
           }
           else{
           frog.lives -= 1
-showCrocodile()}
+          showCrocodile()}
           streak = 0
           if (frog.lives <= 0)
           {
             frog.lives =0
             currentGameState = GameState.GameOver
+            clearInterval(lilypadTimer)
           }
         }
         break;

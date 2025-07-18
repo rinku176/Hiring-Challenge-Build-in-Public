@@ -857,7 +857,7 @@ function generateLilypads()
 
     const allNumbers = [correctNumber, ...wrongNumbers]
     allNumbers.sort(() => Math.random() - 0.5)
-    let x = canvas.clientWidth * 0.5
+    let x = canvas.clientWidth * 0.8
     let lilypadColumn = new Array()
 
     for (let i = 0; i < 3; i++)

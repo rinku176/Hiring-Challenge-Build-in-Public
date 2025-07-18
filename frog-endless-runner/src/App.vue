@@ -215,7 +215,7 @@ function startLevel2()
 {  
   nowRuleSet = RuleSet.Level2
   currentNumber = Math.floor(Math.random() *70 +20) // Random start number between 20-70 for Level 2
-  skipStep = 4//Math.floor(Math.random() *5 +1)
+  skipStep = Math.floor(Math.random() *5 +1)
   startGame()
 }
 
